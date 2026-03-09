@@ -1,0 +1,104 @@
+{
+  "app": {
+    "name": "Mental Health Support",
+    "tagline": "A safe space to talk",
+    "description": "Connect with our AI assistant for compassionate, judgment-free support whenever you need it."
+  },
+  "welcome": {
+    "startConversation": "Start a Conversation",
+    "signInToStart": "Sign In to Start",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "signedInAs": "Signed in as {{name}}",
+    "privacyNote": "Your conversations are private and confidential.",
+    "features": {
+      "private": "Private & Secure",
+      "compassionate": "Compassionate",
+      "available": "Available 24/7"
+    },
+    "footer": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "crisis": "Crisis Resources"
+    }
+  },
+  "pending": {
+    "title": "Approval required",
+    "subtitle": "Your account is pending approval by an administrator.",
+    "signedInAs": "Signed in as {{email}}",
+    "backToHome": "Back to home"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue",
+    "email": "Email",
+    "password": "Password",
+    "signInButton": "Sign In",
+    "signingIn": "Signing in...",
+    "invalidCredentials": "Invalid email or password.",
+    "back": "Back",
+    "otp": {
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "We'll send you a one-time code to sign in",
+      "invitationLabel": "Invitation Code (optional)",
+      "invitationPlaceholder": "Enter invitation code",
+      "invitationHint": "Use a code to apply directly to a group",
+      "sendCode": "Send Code",
+      "sending": "Sending...",
+      "codeLabel": "Verification Code",
+      "codeHint": "Enter the 6-digit code from your email",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "changeEmail": "Change email",
+      "codeSent": "Code sent to",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidCode": "Please enter a 6-digit code",
+      "invalid_otp": "Invalid code. Please try again.",
+      "otp_expired": "Code expired. Please request a new one.",
+      "account_pending_approval": "Your account is awaiting approval.",
+      "account_disapproved": "Your account was disapproved.",
+      "disapproved_cooling_off": "Account disapproved. Please re-apply after the cooloff period.",
+      "invalid_invitation_code": "Invitation code must be alphanumeric.",
+      "invitation_code_not_found": "Invitation code not found.",
+      "guest_disabled": "Guest mode is disabled.",
+      "send_failed": "Failed to send code. Please try again.",
+      "verification_failed": "Verification failed. Please try again."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "show": "Show",
+    "hide": "Hide",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "or": "or",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "signOut": "Sign Out",
+    "notFound": "Not found"
+  },
+  "survey": {
+    "freetext": {
+      "placeholder": "Type your answer...",
+      "placeholderNumber": "Enter a number..."
+    }
+  },
+  "language": {
+    "title": "Language & Region",
+    "language": "Language",
+    "timezone": "Timezone"
+  }
+}

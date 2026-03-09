@@ -1,0 +1,48 @@
+name: Build Docker Image
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        type: string
+        default: 'Dockerfile'
+      context:
+        type: string
+        default: '.'
+      image-name:
+        type: string
+        required: true
+      tag:
+        type: string
+        default: ''
+    secrets:
+      GCP_PROJECT_ID:
+        required: true
+      GCP_SA_KEY:
+        required: true
+    outputs:
+      image-url:
+        value: ${{ jobs.build.outputs.image-url }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-url: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - name: Build and push
+        id: build
+        run: |
+          TAG="${{ inputs.tag || github.sha }}"
+          IMAGE="europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/chat/${{ inputs.image-name }}:${TAG}"
+          docker build -f ${{ inputs.dockerfile }} -t "$IMAGE" ${{ inputs.context }}
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+chat_backend_*.json
+nul
+
+# Evidence screenshots (may be large/sensitive)
+evidence/
+screenshots/
+
+# Downloaded chat sessions from GCS
+chats/
+
+# Temporary cloned repos from extraction
+chat-frontend-temp/
+chat-backend-temp/
+chat-ui-temp/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Transient screenshots and traces
+*.png
+trace_*.json
+
+# Working drafts (YAML maps, transactions)
+mhg-domain-https-map*.yaml
+transaction.yaml
+
+# Chat export working files
+chats/

@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: Review Workflow API
+  version: 1.0.0
+  description: Endpoints for review queue, session review, and reviewer statistics.
+servers:
+  - url: /api
+paths:
+  /review/queue:
+    get:
+      summary: Get review queue
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, flagged, in_progress, completed, all]
+            default: pending
+        - in: query
+          name: risk
+          schema:
+            type: string
+            enum: [all, high, medium_plus, none]
+            default: all
+        - in: query
+          name: assigned
+          schema:
+            type: string
+            enum: [all, me, unassigned]
+            default: all
+        - in: query
+          name: dateRange
+          schema:
+            type: string
+            enum: [today, last_7_days, last_30_days, custom]
+            default: last_7_days
+        - in: query
+          name: language
+          schema:
+            type: string
+            enum: [all, uk, en, ru]
+            default: all
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [priority, newest, oldest, most_messages, fewest_reviews]
+            default: priority
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Queue items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/QueueItem"
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+  /review/sessions/{sessionId}:
+    get:
+      summary: Get session review detail
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session detail with transcript
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetailResponse"
+  /review/sessions/{sessionId}/start:
+    post:
+      summary: Start review for a session
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Review assignment started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartReviewResponse"
+  /review/sessions/{sessionId}/submit:
+    post:
+      summary: Submit completed review
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitReviewRequest"
+      responses:
+        "200":
+          description: Review submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitReviewResponse"
+        "400":
+          description: Validation failed
+  /review/stats/me:
+    get:
+      summary: Get reviewer personal metrics
+      parameters:
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: month
+      responses:
+        "200":
+          description: Personal reviewer statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewerStats"
+  /review/stats/team:
+    get:
+      summary: Get team metrics (senior reviewer and above)
+      responses:
+        "200":
+          description: Team-level review statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamStats"
+components:
+  parameters:
+    SessionId:
+      in: path
+      name: sessionId
+      required: true
+      schema:
+        type: string
+  schemas:
+    QueueItem:
+      type: object
+      required: [sessionId, anonymousUserId, timestamp, messageCount, reviewsRequired, reviewsCompleted]
+      properties:
+        sessionId:
+          type: string
+        anonymousUserId:
+          type: string
+          description: Anonymized identifier, for example USER-7X2K
+        timestamp:
+          type: string
+          format: date-time
+        messageCount:
+          type: integer
+        riskLevel:
+          type: string
+          enum: [none, low, medium, high]
+        riskNote:
+          type: string
+        reviewsRequired:
+          type: integer
+        reviewsCompleted:
+          type: integer
+        reviewerSummaries:
+          type: array
+          items:
+            type: object
+            properties:
+              reviewerDisplayName:
+                type: string
+              averageScore:
+                type: number
+                format: float
+    SessionDetailResponse:
+      type: object
+      properties:
+        session:
+          type: object
+          properties:
+            id:
+              type: string
+            anonymousUserId:
+              type: string
+            language:
+              type: string
+            startedAt:
+              type: string
+              format: date-time
+            endedAt:
+              type: string
+              format: date-time
+            messageCount:
+              type: integer
+            riskLevel:
+              type: string
+              enum: [none, low, medium, high]
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              role:
+                type: string
+                enum: [user, assistant, system]
+              content:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              riskFlag:
+                type: boolean
+        existingReviews:
+          type: object
+          properties:
+            count:
+              type: integer
+            averageScore:
+              type: number
+              format: float
+    StartReviewResponse:
+      type: object
+      required: [reviewId, sessionId, startedAt, expiresAt]
+      properties:
+        reviewId:
+          type: string
+        sessionId:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+    SubmitReviewRequest:
+      type: object
+      required: [ratings]
+      properties:
+        ratings:
+          type: array
+          items:
+            type: object
+            required: [messageId, score]
+            properties:
+              messageId:
+                type: string
+              score:
+                type: integer
+                minimum: 1
+                maximum: 10
+              comment:
+                type: string
+              criteria:
+                type: object
+                properties:
+                  relevance:
+                    type: string
+                  empathy:
+                    type: string
+                  safety:
+                    type: string
+                  ethics:
+                    type: string
+                  clarity:
+                    type: string
+        overallComment:
+          type: string
+    SubmitReviewResponse:
+      type: object
+      properties:
+        reviewId:
+          type: string
+        averageScore:
+          type: number
+          format: float
+        sessionStatus:
+          type: string
+          enum: [in_progress, completed, disputed, tiebreaker, resolved]
+        reviewsCompleted:
+          type: integer
+        reviewsRequired:
+          type: integer
+    ReviewerStats:
+      type: object
+      properties:
+        reviewsCompleted:
+          type: integer
+        averageScoreGiven:
+          type: number
+          format: float
+        agreementRate:
+          type: number
+          format: float
+        flagsRaised:
+          type: integer
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+    TeamStats:
+      type: object
+      properties:
+        totalReviews:
+          type: integer
+        averageTeamScore:
+          type: number
+          format: float
+        interRaterReliability:
+          type: number
+          format: float
+        pendingEscalations:
+          type: integer

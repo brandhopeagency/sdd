@@ -1,0 +1,201 @@
+openapi: 3.0.3
+info:
+  title: Domain Access Configuration API
+  version: 1.0.0
+  description: >
+    Contract for managing and validating environment domain mapping, HTTPS
+    enforcement, canonical redirects, and network-restricted development access.
+servers:
+  - url: https://infra-admin.internal
+paths:
+  /v1/domain-access/configuration:
+    get:
+      summary: Get current domain access configuration
+      operationId: getDomainAccessConfiguration
+      responses:
+        '200':
+          description: Current configuration returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainAccessConfiguration'
+  /v1/domain-access/configuration/apply:
+    post:
+      summary: Apply domain access configuration changes
+      operationId: applyDomainAccessConfiguration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyConfigurationRequest'
+      responses:
+        '202':
+          description: Apply request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplyConfigurationResponse'
+  /v1/domain-access/validation:
+    post:
+      summary: Run validation for routing, certificate, and access policy
+      operationId: validateDomainAccess
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+      responses:
+        '200':
+          description: Validation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResult'
+components:
+  schemas:
+    DomainAccessConfiguration:
+      type: object
+      required:
+        - environmentMappings
+        - redirects
+        - certificates
+      properties:
+        environmentMappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentMapping'
+        redirects:
+          type: array
+          items:
+            $ref: '#/components/schemas/RedirectRule'
+        certificates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificateCoverage'
+    EnvironmentMapping:
+      type: object
+      required:
+        - environment
+        - hostname
+        - httpsOnly
+        - accessMode
+      properties:
+        environment:
+          type: string
+          enum: [production, development]
+        hostname:
+          type: string
+          example: mentalhelp.chat
+        httpsOnly:
+          type: boolean
+          example: true
+        accessMode:
+          type: string
+          enum: [public, network-restricted]
+        allowedCidrs:
+          type: array
+          items:
+            type: string
+          description: Required when accessMode is network-restricted.
+    RedirectRule:
+      type: object
+      required:
+        - sourceHost
+        - sourceProtocol
+        - destinationUrl
+        - statusCode
+      properties:
+        sourceHost:
+          type: string
+          example: www.mentalhelp.chat
+        sourceProtocol:
+          type: string
+          enum: [http, https]
+        destinationUrl:
+          type: string
+          example: https://mentalhelp.chat
+        statusCode:
+          type: integer
+          enum: [301, 308]
+    CertificateCoverage:
+      type: object
+      required:
+        - coveredHostnames
+        - verificationStatus
+      properties:
+        coveredHostnames:
+          type: array
+          items:
+            type: string
+        verificationStatus:
+          type: string
+          enum: [provisioning, active, failed, expired]
+        validTo:
+          type: string
+          format: date-time
+    ApplyConfigurationRequest:
+      type: object
+      required:
+        - requestedBy
+        - configuration
+      properties:
+        requestedBy:
+          type: string
+        changeReason:
+          type: string
+        configuration:
+          $ref: '#/components/schemas/DomainAccessConfiguration'
+    ApplyConfigurationResponse:
+      type: object
+      required:
+        - changeId
+        - status
+      properties:
+        changeId:
+          type: string
+        status:
+          type: string
+          enum: [accepted, rejected]
+        message:
+          type: string
+    ValidationRequest:
+      type: object
+      required:
+        - environments
+      properties:
+        environments:
+          type: array
+          items:
+            type: string
+            enum: [production, development]
+        checks:
+          type: array
+          items:
+            type: string
+            enum: [dns-resolution, https-enforcement, certificate-trust, host-redirect, network-restriction]
+    ValidationResult:
+      type: object
+      required:
+        - overallStatus
+        - results
+      properties:
+        overallStatus:
+          type: string
+          enum: [passed, failed]
+        results:
+          type: array
+          items:
+            type: object
+            required:
+              - check
+              - status
+            properties:
+              check:
+                type: string
+              status:
+                type: string
+                enum: [passed, failed]
+              detail:
+                type: string

@@ -1,0 +1,130 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-types
+          path: chat-types
+          token: ${{ secrets.PKG_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-frontend-common
+          path: chat-frontend-common
+          token: ${{ secrets.PKG_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Build chat-types locally
+        run: cd chat-types && npm install && npm run build
+      - name: Build chat-frontend-common locally
+        run: cd chat-frontend-common && npm install && npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+      - name: Install dependencies
+        run: |
+          npm pkg set "dependencies.@mentalhelpglobal/chat-types=file:./chat-types"
+          npm pkg set "dependencies.@mentalhelpglobal/chat-frontend-common=file:./chat-frontend-common"
+          npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+      - name: Lint
+        run: npx eslint --ignore-pattern 'chat-types/**' --ignore-pattern 'chat-frontend-common/**' .
+      - name: Run tests with coverage
+        run: npx vitest run --coverage --passWithNoTests
+      - name: Build
+        run: npm run build
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-types
+          path: chat-types
+          token: ${{ secrets.PKG_TOKEN }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-frontend-common
+          path: chat-frontend-common
+          token: ${{ secrets.PKG_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Build chat-types locally
+        run: cd chat-types && npm install && npm run build
+
+      - name: Build chat-frontend-common locally
+        run: cd chat-frontend-common && npm install && npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          npm pkg set "dependencies.@mentalhelpglobal/chat-types=file:./chat-types"
+          npm pkg set "dependencies.@mentalhelpglobal/chat-frontend-common=file:./chat-frontend-common"
+          npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.BACKEND_URL }}
+          VITE_CHAT_URL: ${{ vars.CHAT_URL }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to GCS
+        run: gsutil -m rsync -r -d dist/ gs://${{ vars.GCS_BUCKET }}/
+
+      - name: Set cache headers
+        run: |
+          gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" \
+            "gs://${{ vars.GCS_BUCKET }}/assets/**"
+          gsutil setmeta -h "Cache-Control:no-cache, no-store, must-revalidate" \
+            "gs://${{ vars.GCS_BUCKET }}/index.html"
+
+      - name: Restore SPA deep-link fallbacks
+        run: |
+          ROUTES=(
+            "login"
+            "pending"
+            "workbench"
+          )
+          for route in "${ROUTES[@]}"; do
+            gsutil cp "gs://${{ vars.GCS_BUCKET }}/index.html" "gs://${{ vars.GCS_BUCKET }}/${route}"
+          done
+
+      - name: Output frontend URL
+        run: |
+          echo "### Workbench frontend deployed! :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          echo "Bucket: \`${{ vars.GCS_BUCKET }}\`" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "enforce-i18n-namespace ESLint Rule Options",
+  "description": "Configuration schema for the custom ESLint rule that enforces i18n namespace usage in feature directories",
+  "type": "array",
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "namespaceMap": {
+          "type": "object",
+          "description": "Maps directory patterns (relative to project root) to required i18n namespace names",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "src/features/workbench/review": "review"
+            }
+          ]
+        }
+      },
+      "required": ["namespaceMap"],
+      "additionalProperties": false
+    }
+  ],
+  "minItems": 1,
+  "maxItems": 1
+}

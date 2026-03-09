@@ -1,0 +1,30 @@
+name: Publish Package
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@mentalhelpglobal/chat-types@${VERSION}" version --registry https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "Version @mentalhelpglobal/chat-types@${VERSION} already published; skipping npm publish."
+          else
+            npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,364 @@
+openapi: 3.0.3
+info:
+  title: Frontend and Backend Split Validation Contract
+  version: 1.1.0
+  description: >
+    Validation-oriented contract for split chat/workbench FE + BE rollout with
+    independent backend scaling and dedicated workbench domains in prod/dev.
+paths:
+  /contracts/validation/experience-split:
+    post:
+      summary: Record FE split and deep-link outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperienceSplitEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/backend-surface:
+    post:
+      summary: Record backend service boundary and scaling isolation outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackendSurfaceEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/domain-topology:
+    post:
+      summary: Record prod/dev domain and API host mapping outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainTopologyEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/access-policy:
+    post:
+      summary: Record role-boundary validation outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicyEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/responsive-pwa:
+    post:
+      summary: Record responsive viewport and PWA installability outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsivePwaEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/accessibility-i18n:
+    post:
+      summary: Record accessibility and localization validation outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessibilityI18nEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+  /contracts/validation/route-mapping:
+    post:
+      summary: Record legacy-route mapping outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteMappingEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+components:
+  schemas:
+    ValidationAck:
+      type: object
+      required: [accepted, evidenceId]
+      properties:
+        accepted:
+          type: boolean
+        evidenceId:
+          type: string
+    ExperienceSplitEvidence:
+      type: object
+      required: [buildRef, surfaceResults]
+      properties:
+        buildRef:
+          type: string
+        surfaceResults:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/SurfaceResult'
+    SurfaceResult:
+      type: object
+      required: [surface, frontendHost, apiHost, entryPathPassed, deepLinkPassed, criticalFlowPassed]
+      properties:
+        surface:
+          type: string
+          enum: [chat, workbench]
+        frontendHost:
+          type: string
+        apiHost:
+          type: string
+        entryPathPassed:
+          type: boolean
+        deepLinkPassed:
+          type: boolean
+        criticalFlowPassed:
+          type: boolean
+    BackendSurfaceEvidence:
+      type: object
+      required: [buildRef, services, scalingIsolationChecks]
+      properties:
+        buildRef:
+          type: string
+        services:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/BackendServiceRecord'
+        scalingIsolationChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScalingIsolationCheck'
+    BackendServiceRecord:
+      type: object
+      required: [service, environment, deployedIndependently]
+      properties:
+        service:
+          type: string
+          enum: [chat-api, workbench-api]
+        environment:
+          type: string
+          enum: [dev, prod]
+        deployedIndependently:
+          type: boolean
+    ScalingIsolationCheck:
+      type: object
+      required: [scaledService, unaffectedService, passed]
+      properties:
+        scaledService:
+          type: string
+        unaffectedService:
+          type: string
+        passed:
+          type: boolean
+    DomainTopologyEvidence:
+      type: object
+      required: [buildRef, environments]
+      properties:
+        buildRef:
+          type: string
+        environments:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/EnvironmentDomainRecord'
+    EnvironmentDomainRecord:
+      type: object
+      required: [environment, chatFrontendHost, chatApiHost, workbenchFrontendHost, workbenchApiHost, passed]
+      properties:
+        environment:
+          type: string
+          enum: [dev, prod]
+        chatFrontendHost:
+          type: string
+        chatApiHost:
+          type: string
+        workbenchFrontendHost:
+          type: string
+        workbenchApiHost:
+          type: string
+        passed:
+          type: boolean
+    AccessPolicyEvidence:
+      type: object
+      required: [buildRef, policyChecks]
+      properties:
+        buildRef:
+          type: string
+        policyChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyCheck'
+    PolicyCheck:
+      type: object
+      required: [userClass, targetSurface, expectedOutcome, actualOutcome, passed]
+      properties:
+        userClass:
+          type: string
+        targetSurface:
+          type: string
+          enum: [chat, workbench]
+        expectedOutcome:
+          type: string
+        actualOutcome:
+          type: string
+        passed:
+          type: boolean
+    RouteMappingEvidence:
+      type: object
+      required: [buildRef, mappingChecks, regressionSignals]
+      properties:
+        buildRef:
+          type: string
+        mappingChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/MappingCheck'
+        regressionSignals:
+          type: array
+          items:
+            type: string
+    MappingCheck:
+      type: object
+      required: [sourceRoute, resolvedRoute, statusCode, passed]
+      properties:
+        sourceRoute:
+          type: string
+        resolvedRoute:
+          type: string
+        statusCode:
+          type: integer
+          minimum: 100
+          maximum: 599
+        passed:
+          type: boolean
+    ResponsivePwaEvidence:
+      type: object
+      required: [buildRef, viewportChecks, pwaChecks]
+      properties:
+        buildRef:
+          type: string
+        viewportChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViewportCheck'
+        pwaChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PwaCheck'
+    ViewportCheck:
+      type: object
+      required: [surface, viewportName, width, noHorizontalOverflow, touchTargetsAdequate, passed]
+      properties:
+        surface:
+          type: string
+          enum: [chat, workbench]
+        viewportName:
+          type: string
+        width:
+          type: integer
+        noHorizontalOverflow:
+          type: boolean
+        touchTargetsAdequate:
+          type: boolean
+        passed:
+          type: boolean
+    PwaCheck:
+      type: object
+      required: [surface, manifestValid, serviceWorkerRegistered, installPromptAvailable, passed]
+      properties:
+        surface:
+          type: string
+          enum: [chat, workbench]
+        manifestValid:
+          type: boolean
+        serviceWorkerRegistered:
+          type: boolean
+        installPromptAvailable:
+          type: boolean
+        passed:
+          type: boolean
+    AccessibilityI18nEvidence:
+      type: object
+      required: [buildRef, a11yChecks, localeChecks]
+      properties:
+        buildRef:
+          type: string
+        a11yChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/A11yCheck'
+        localeChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocaleCheck'
+    A11yCheck:
+      type: object
+      required: [surface, langAttributePresent, keyboardNavigable, contrastPasses, passed]
+      properties:
+        surface:
+          type: string
+          enum: [chat, workbench]
+        langAttributePresent:
+          type: boolean
+        keyboardNavigable:
+          type: boolean
+        contrastPasses:
+          type: boolean
+        passed:
+          type: boolean
+    LocaleCheck:
+      type: object
+      required: [surface, locale, allKeysTranslated, passed]
+      properties:
+        surface:
+          type: string
+          enum: [chat, workbench]
+        locale:
+          type: string
+        allKeysTranslated:
+          type: boolean
+        passed:
+          type: boolean

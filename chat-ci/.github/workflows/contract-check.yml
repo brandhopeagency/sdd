@@ -1,0 +1,46 @@
+name: API Contract Check
+on:
+  workflow_call:
+    inputs:
+      backend-url:
+        description: Backend health endpoint
+        type: string
+        required: true
+      required-version:
+        description: Minimum required API version
+        type: string
+        required: true
+    outputs:
+      compatible:
+        value: ${{ jobs.check.outputs.compatible }}
+      backend-version:
+        value: ${{ jobs.check.outputs.backend-version }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      compatible: ${{ steps.check.outputs.compatible }}
+      backend-version: ${{ steps.check.outputs.version }}
+    steps:
+      - name: Check API version compatibility
+        id: check
+        run: |
+          BACKEND_VERSION=$(curl -s -I "${{ inputs.backend-url }}" | grep -i X-API-Version | cut -d: -f2 | tr -d ' \r')
+          echo "version=$BACKEND_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$BACKEND_VERSION" ]; then
+            echo "No X-API-Version header found"
+            echo "compatible=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          npx semver -r "^${{ inputs.required-version }}" "$BACKEND_VERSION" > /dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            echo "API compatible: backend=$BACKEND_VERSION, required=^${{ inputs.required-version }}"
+            echo "compatible=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "API INCOMPATIBLE: backend=$BACKEND_VERSION, required=^${{ inputs.required-version }}"
+            echo "compatible=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi

@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: Group User Creation API
+  version: 1.0.0
+  description: Extended group member addition supporting inline new user creation
+
+paths:
+  /api/group/users:
+    post:
+      summary: Add a user to the group (existing or new)
+      description: >
+        Adds a user to the authenticated user's active group. Accepts either
+        a userId for existing users or a newUser payload to create an account
+        inline. When newUser is provided and no existing user matches the email,
+        the system creates the user and adds them to the group atomically.
+        The new user receives an invitation notification.
+      tags: [GroupManagement]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/AddExistingUserInput'
+                - $ref: '#/components/schemas/AddNewUserInput'
+              discriminator:
+                propertyName: type
+      responses:
+        '201':
+          description: User added to group (created if new)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId: { type: string, format: uuid }
+                  email: { type: string, format: email }
+                  isNewUser: { type: boolean }
+                  groupId: { type: string, format: uuid }
+                  invitationSent: { type: boolean }
+        '400':
+          description: Validation error (missing fields, invalid email)
+        '403':
+          description: Requires WORKBENCH_GROUP_USERS permission
+        '409':
+          description: User is already a member of this group
+
+  /api/group/users/check-email:
+    get:
+      summary: Check if an email belongs to an existing user
+      description: >
+        Pre-flight check used by the frontend to determine whether to show
+        the "add existing user" or "create new user" form. Does not reveal
+        user details beyond existence.
+      tags: [GroupManagement]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema: { type: string, format: email }
+      responses:
+        '200':
+          description: Email check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists: { type: boolean }
+                  userId: { type: string, format: uuid, nullable: true }
+                  displayName: { type: string, nullable: true }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AddExistingUserInput:
+      type: object
+      required: [type, userId]
+      properties:
+        type: { type: string, const: existing }
+        userId: { type: string, format: uuid }
+        role:
+          type: string
+          enum: [member, admin]
+          default: member
+
+    AddNewUserInput:
+      type: object
+      required: [type, email, name]
+      properties:
+        type: { type: string, const: new }
+        email: { type: string, format: email }
+        name: { type: string, minLength: 1, maxLength: 200 }
+        role:
+          type: string
+          enum: [member, admin]
+          default: member
+        userRole:
+          type: string
+          description: System-level role for the new user account
+          enum: [user, qa_specialist, researcher, supervisor, moderator, group_admin, owner]
+          default: user

@@ -1,0 +1,5 @@
+name: mhg-domain-http-redirect-map
+defaultUrlRedirect:
+  httpsRedirect: true
+  redirectResponseCode: MOVED_PERMANENTLY_DEFAULT
+  stripQuery: false

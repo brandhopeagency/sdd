@@ -1,0 +1,520 @@
+openapi: 3.1.0
+info:
+  title: Chat Moderation & Review API — Risk Flagging & Escalation
+  version: 1.0.0
+  description: |
+    API endpoints for risk flagging, escalation management, and
+    deanonymization workflows. Covers safety-critical operations
+    with tiered severity handling and audit-logged identity access.
+
+servers:
+  - url: /api/review
+    description: Review API base path
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Severity:
+      type: string
+      enum: [high, medium, low]
+
+    FlagStatus:
+      type: string
+      enum: [open, acknowledged, resolved, escalated]
+
+    ReasonCategory:
+      type: string
+      enum:
+        - crisis_indicators
+        - self_harm_language
+        - inappropriate_ai_response
+        - ethical_concern
+        - other_safety_concern
+
+    DeanonymizationStatus:
+      type: string
+      enum: [pending, approved, denied]
+
+    JustificationCategory:
+      type: string
+      enum:
+        - welfare_check
+        - legal_requirement
+        - clinical_escalation
+        - investigation
+
+    RiskFlagDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        anonymousSessionId:
+          type: string
+          example: "CHAT-A3F2"
+        flaggedBy:
+          type: string
+          format: uuid
+          nullable: true
+        flaggedByName:
+          type: string
+          nullable: true
+        severity:
+          $ref: '#/components/schemas/Severity'
+        reasonCategory:
+          $ref: '#/components/schemas/ReasonCategory'
+        details:
+          type: string
+        status:
+          $ref: '#/components/schemas/FlagStatus'
+        assignedModeratorId:
+          type: string
+          format: uuid
+          nullable: true
+        assignedModeratorName:
+          type: string
+          nullable: true
+        resolutionNotes:
+          type: string
+          nullable: true
+        resolvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        isAutoDetected:
+          type: boolean
+        matchedKeywords:
+          type: array
+          items:
+            type: string
+          nullable: true
+        deanonymizationRequested:
+          type: boolean
+        slaDeadline:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateFlagInput:
+      type: object
+      required: [severity, reasonCategory, details]
+      properties:
+        severity:
+          $ref: '#/components/schemas/Severity'
+        reasonCategory:
+          $ref: '#/components/schemas/ReasonCategory'
+        details:
+          type: string
+          minLength: 10
+        requestDeanonymization:
+          type: boolean
+          default: false
+        deanonymizationJustification:
+          type: string
+          description: Required if requestDeanonymization is true
+
+    ResolveFlagInput:
+      type: object
+      required: [resolutionNotes]
+      properties:
+        resolutionNotes:
+          type: string
+          minLength: 10
+        newStatus:
+          type: string
+          enum: [acknowledged, resolved, escalated]
+
+    DeanonymizationRequestDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        anonymousSessionId:
+          type: string
+        targetAnonymousUserId:
+          type: string
+          description: "USER-XXXX format"
+        requesterId:
+          type: string
+          format: uuid
+        requesterName:
+          type: string
+        approverId:
+          type: string
+          format: uuid
+          nullable: true
+        approverName:
+          type: string
+          nullable: true
+        riskFlagId:
+          type: string
+          format: uuid
+          nullable: true
+        justificationCategory:
+          $ref: '#/components/schemas/JustificationCategory'
+        justificationDetails:
+          type: string
+        status:
+          $ref: '#/components/schemas/DeanonymizationStatus'
+        denialNotes:
+          type: string
+          nullable: true
+        accessExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateDeanonymizationInput:
+      type: object
+      required: [sessionId, justificationCategory, justificationDetails]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        justificationCategory:
+          $ref: '#/components/schemas/JustificationCategory'
+        justificationDetails:
+          type: string
+          minLength: 20
+        riskFlagId:
+          type: string
+          format: uuid
+          nullable: true
+
+    ApproveDeanonymizationInput:
+      type: object
+      properties:
+        accessDurationHours:
+          type: integer
+          default: 24
+          description: Hours of access to grant (overrides default)
+
+    DenyDeanonymizationInput:
+      type: object
+      required: [denialNotes]
+      properties:
+        denialNotes:
+          type: string
+          minLength: 10
+
+    RevealedIdentity:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        realUserId:
+          type: string
+          format: uuid
+        email:
+          type: string
+        displayName:
+          type: string
+        accessExpiresAt:
+          type: string
+          format: date-time
+
+    PaginatedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+paths:
+  /sessions/{sessionId}/flags:
+    get:
+      summary: List risk flags for a session
+      operationId: listSessionFlags
+      tags: [Risk Flags]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of flags for the session
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiskFlagDetail'
+
+    post:
+      summary: Create a risk flag
+      description: |
+        Submit a risk flag for a session. High-severity flags trigger
+        immediate notifications to moderators and commanders.
+        Optionally requests deanonymization alongside the flag.
+      operationId: createFlag
+      tags: [Risk Flags]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFlagInput'
+      responses:
+        '201':
+          description: Flag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskFlagDetail'
+
+  /escalations:
+    get:
+      summary: Get escalation queue
+      description: |
+        Returns paginated list of open/acknowledged risk flags for moderators.
+        Sorted by severity (high first) then SLA deadline.
+      operationId: getEscalationQueue
+      tags: [Escalation]
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            $ref: '#/components/schemas/Severity'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/FlagStatus'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated escalation queue
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RiskFlagDetail'
+                      counts:
+                        type: object
+                        properties:
+                          highOpen:
+                            type: integer
+                          mediumOpen:
+                            type: integer
+                          overdueSla:
+                            type: integer
+
+  /flags/{flagId}/resolve:
+    patch:
+      summary: Resolve or update a risk flag
+      description: |
+        Acknowledge, resolve, or escalate a risk flag. Moderators and above
+        can perform this action. Resolution notes are required.
+      operationId: resolveFlag
+      tags: [Escalation]
+      parameters:
+        - name: flagId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveFlagInput'
+      responses:
+        '200':
+          description: Flag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskFlagDetail'
+
+  /deanonymization:
+    get:
+      summary: List deanonymization requests
+      description: |
+        Returns pending deanonymization requests for commanders/admins,
+        or all requests for the current user if they are a requester.
+      operationId: listDeanonymizationRequests
+      tags: [Deanonymization]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/DeanonymizationStatus'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated deanonymization requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DeanonymizationRequestDetail'
+
+    post:
+      summary: Create a deanonymization request
+      operationId: createDeanonymizationRequest
+      tags: [Deanonymization]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeanonymizationInput'
+      responses:
+        '201':
+          description: Request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeanonymizationRequestDetail'
+
+  /deanonymization/{requestId}/approve:
+    post:
+      summary: Approve a deanonymization request
+      description: |
+        Commander or admin approves the request. Sets time-limited access
+        and audit-logs the approval.
+      operationId: approveDeanonymization
+      tags: [Deanonymization]
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveDeanonymizationInput'
+      responses:
+        '200':
+          description: Request approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeanonymizationRequestDetail'
+
+  /deanonymization/{requestId}/deny:
+    post:
+      summary: Deny a deanonymization request
+      operationId: denyDeanonymization
+      tags: [Deanonymization]
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DenyDeanonymizationInput'
+      responses:
+        '200':
+          description: Request denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeanonymizationRequestDetail'
+
+  /deanonymization/{requestId}/identity:
+    get:
+      summary: Retrieve revealed identity
+      description: |
+        Returns the real user identity for an approved deanonymization request.
+        Only accessible by the original requester, within the time-limited
+        access window. Audit-logged on every access.
+      operationId: getRevealedIdentity
+      tags: [Deanonymization]
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Revealed identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevealedIdentity'
+        '403':
+          description: Access denied (not requester, not approved, or expired)

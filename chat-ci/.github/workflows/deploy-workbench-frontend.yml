@@ -1,0 +1,80 @@
+name: Deploy Workbench Frontend
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Target environment (dev/staging/prod)
+        type: string
+        required: true
+      bucket-name:
+        description: GCS bucket name for workbench frontend static hosting
+        type: string
+        required: true
+      backend-url:
+        description: Workbench backend API URL
+        type: string
+        required: true
+      chat-url:
+        description: Chat frontend URL (for cross-surface links)
+        type: string
+        required: true
+      gcp-service-account:
+        description: GCP service account for WIF auth
+        type: string
+        required: true
+    secrets:
+      GCP_WIF_PROVIDER:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ inputs.backend-url }}
+          VITE_CHAT_URL: ${{ inputs.chat-url }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ inputs.gcp-service-account }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to GCS
+        run: |
+          gsutil -m rsync -r -d dist/ gs://${{ inputs.bucket-name }}/
+
+      - name: Set cache headers
+        run: |
+          gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" \
+            "gs://${{ inputs.bucket-name }}/assets/**"
+          gsutil setmeta -h "Cache-Control:no-cache, no-store, must-revalidate" \
+            "gs://${{ inputs.bucket-name }}/index.html"
+
+      - name: Output frontend URL
+        run: |
+          echo "### Workbench frontend deployed! :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          echo "Bucket: \`${{ inputs.bucket-name }}\`" >> $GITHUB_STEP_SUMMARY

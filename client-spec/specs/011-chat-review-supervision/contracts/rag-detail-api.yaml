@@ -1,0 +1,108 @@
+openapi: 3.1.0
+info:
+  title: RAG Detail API
+  version: 1.0.0
+  description: RAG call detail exposure on chat messages for reviewers and testers
+
+paths:
+  /api/review/sessions/{sessionId}/messages:
+    get:
+      summary: Get session messages with RAG details (review context)
+      description: >
+        Returns anonymized messages for a session in review context.
+        Extends the existing response to include RAG call details on AI messages
+        that involved a retrieval call. Available to all users with REVIEW_ACCESS.
+      tags: [RAGDetails]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Messages with RAG details included
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AnonymizedMessageWithRAG' }
+
+  /api/chat/sessions/{sessionId}/messages:
+    get:
+      summary: Get chat messages with optional RAG details (chat context)
+      description: >
+        Returns messages for a chat session in the end-user context.
+        RAG details are included only when the authenticated user has
+        a tester tag. Regular users receive messages without RAG metadata.
+      tags: [RAGDetails]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Messages with conditional RAG details
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ChatMessageWithOptionalRAG' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AnonymizedMessageWithRAG:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        timestamp: { type: string, format: date-time }
+        ragDetails:
+          nullable: true
+          description: Present only on assistant messages that involved a RAG call
+          type: object
+          properties:
+            retrievalQuery: { type: string }
+            retrievedDocuments:
+              type: array
+              items:
+                type: object
+                properties:
+                  title: { type: string }
+                  relevanceScore: { type: number, minimum: 0, maximum: 1 }
+                  contentSnippet: { type: string }
+            retrievalTimestamp: { type: string, format: date-time }
+
+    ChatMessageWithOptionalRAG:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        timestamp: { type: string, format: date-time }
+        ragDetails:
+          nullable: true
+          description: Present only for tester-tagged users on assistant messages with RAG calls
+          type: object
+          properties:
+            retrievalQuery: { type: string }
+            retrievedDocuments:
+              type: array
+              items:
+                type: object
+                properties:
+                  title: { type: string }
+                  relevanceScore: { type: number }
+                  contentSnippet: { type: string }
+            retrievalTimestamp: { type: string, format: date-time }

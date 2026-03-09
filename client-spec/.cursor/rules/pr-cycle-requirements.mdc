@@ -1,0 +1,32 @@
+---
+description: Mandatory PR cycle requirements for feature and bugfix delivery
+alwaysApply: true
+---
+
+# PR Cycle Requirements
+
+All feature/bugfix delivery must follow this cycle:
+
+1. Create a dedicated branch from `develop` (`feature/*` or `bugfix/*`).
+2. Implement changes and run relevant unit/UI verification before opening PR.
+3. Open a PR into `develop` with clear scope and test evidence.
+4. Complete code review; apply fixes in follow-up commits (no direct pushes to `develop`).
+5. Merge only after required checks pass and required reviews are approved.
+6. Prefer squash merge for linear history, unless repository policy says otherwise.
+7. After merge, delete remote feature/bugfix branch, delete local branch, and sync local `develop` with `origin/develop`.
+
+Do not bypass PR checks or review gates.
+
+## Release Promotion To Main And Production
+
+When promoting integrated work to production:
+
+1. Cut a short-lived `release/*` branch from `develop` at the agreed cut-off point.
+2. Run full release validation on that branch (unit/integration/UI and migration safety checks).
+3. Open a PR from `release/*` into `main` with scope, risks, rollback notes, and test evidence.
+4. Merge to `main` only after required reviews and required checks are green.
+5. Create an immutable release tag on the merged `main` commit.
+6. Deploy production from that exact `main` tag/commit (not from `develop` or an untagged ref).
+7. Run post-deploy smoke checks and critical path verification; if needed, rollback by redeploying the previous known-good tag.
+
+Production deployment must be traceable to a reviewed PR and a tagged `main` commit.

@@ -1,0 +1,627 @@
+{
+  "app": {
+    "name": "Mental Health Support",
+    "tagline": "A safe space to talk",
+    "description": "Connect with our AI assistant for compassionate, judgment-free support whenever you need it."
+  },
+  "welcome": {
+    "startConversation": "Start a Conversation",
+    "signInToStart": "Sign In to Start",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "signedInAs": "Signed in as {{name}}",
+    "privacyNote": "Your conversations are private and confidential.",
+    "features": {
+      "private": "Private & Secure",
+      "compassionate": "Compassionate",
+      "available": "Available 24/7"
+    },
+    "footer": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "crisis": "Crisis Resources"
+    }
+  },
+  "pending": {
+    "title": "Approval required",
+    "subtitle": "Your account is pending approval by an administrator.",
+    "signedInAs": "Signed in as {{email}}",
+    "backToHome": "Back to home"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue",
+    "email": "Email",
+    "password": "Password",
+    "signInButton": "Sign In",
+    "signingIn": "Signing in...",
+    "invalidCredentials": "Invalid email or password.",
+    "back": "Back",
+    "otp": {
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "We'll send you a one-time code to sign in",
+      "invitationLabel": "Invitation Code (optional)",
+      "invitationPlaceholder": "Enter invitation code",
+      "invitationHint": "Use a code to apply directly to a group",
+      "sendCode": "Send Code",
+      "sending": "Sending...",
+      "codeLabel": "Verification Code",
+      "codeHint": "Enter the 6-digit code from your email",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "changeEmail": "Change email",
+      "codeSent": "Code sent to",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidCode": "Please enter a 6-digit code",
+      "invalid_otp": "Invalid code. Please try again.",
+      "otp_expired": "Code expired. Please request a new one.",
+      "account_pending_approval": "Your account is awaiting approval.",
+      "account_disapproved": "Your account was disapproved.",
+      "disapproved_cooling_off": "Account disapproved. Please re-apply after the cooloff period.",
+      "invalid_invitation_code": "Invitation code must be alphanumeric.",
+      "invitation_code_not_found": "Invitation code not found.",
+      "guest_disabled": "Guest mode is disabled.",
+      "otp_disabled_workbench": "Email login is not available for this application.",
+      "google_login_failed": "Google sign-in failed. Please try again.",
+      "rate_limited": "Too many attempts. Please wait {{seconds}}s before trying again.",
+      "rate_limited_send": "Please wait {{seconds}}s before requesting another code."
+    },
+    "google": {
+      "error": "Google sign-in failed. Please try again.",
+      "noCredential": "No credential received from Google."
+    },
+    "divider": "or",
+    "noMethodsAvailable": "No login methods are currently available."
+  },
+  "chat": {
+    "header": {
+      "title": "Mental Health Assistant",
+      "subtitle": "Here to support you"
+    },
+    "input": {
+      "placeholder": "Type your message...",
+      "send": "Send",
+      "debugTip": "Tip: Type /debug:enable for debug mode"
+    },
+    "session": {
+      "end": "End Chat",
+      "new": "New Session",
+      "starting": "Starting session...",
+      "processing": "Processing...",
+      "expired": "Your session has expired. Please sign in again.",
+      "reconnecting": "Reconnecting..."
+    },
+    "memory": {
+      "updating": "Updating memory in background…"
+    },
+    "memoryCollapsedHint": "{{count}} blocks",
+    "messages": {
+      "assistant": "Assistant",
+      "you": "You",
+      "helpful": "Helpful",
+      "notHelpful": "Not helpful",
+      "giveFeedback": "Give detailed feedback",
+      "feedbackSubmitted": "Feedback submitted",
+      "thanks": "Thanks!"
+    },
+    "debug": {
+      "title": "Debug Mode",
+      "info": "Debug Info",
+      "intent": "Intent",
+      "confidence": "Confidence",
+      "responseTime": "Response Time",
+      "parameters": "Parameters",
+      "systemPrompts": "System prompts",
+      "summarizationPrompt": "Summarization / search prompt",
+      "searchResultsUsedInMainPrompt": "Search results used in main prompt",
+      "userMemory": "User memory",
+      "loading": "Loading…",
+      "loadFailed": "Failed to load",
+      "memoryEmpty": "Memory is empty or not created yet for this user"
+    },
+    "guest": "Guest",
+    "register": "Register",
+    "registerPopup": {
+      "title": "Register",
+      "subtitle": "Save your chat",
+      "chatPreserved": "Your current conversation will be saved to your account"
+    }
+  },
+  "feedback": {
+    "title": "Provide Feedback",
+    "question": "How helpful was this response?",
+    "selectRating": "Select a rating",
+    "ratings": {
+      "poor": "Poor",
+      "fair": "Fair",
+      "good": "Good",
+      "great": "Great",
+      "excellent": "Excellent"
+    },
+    "comment": "Additional comments (optional)",
+    "commentPlaceholder": "Tell us more about your experience...",
+    "cancel": "Cancel",
+    "submit": "Submit Feedback"
+  },
+  "workbench": {
+    "title": "Workbench",
+    "subtitle": "Admin Panel",
+    "scopeSelector": {
+      "label": "Space",
+      "ariaLabel": "Select space",
+      "global": "Global",
+      "placeholder": "Select a space"
+    },
+    "groupSelector": {
+      "label": "Active group",
+      "ariaLabel": "Select group"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "groupDashboard": "Group Dashboard",
+      "groupUsers": "Group Users",
+      "groupChats": "Group Chats",
+      "groupSection": "Group resources",
+      "users": "User Management",
+      "groups": "Group management",
+      "approvals": "Approvals",
+      "research": "Research & Moderation",
+      "privacy": "Privacy Controls",
+      "reviewReports": "Reports & Analytics",
+      "tagManagement": "Tag Management",
+      "settings": "Settings",
+      "backToChat": "Back to Chat"
+    },
+    "pii": {
+      "masked": "Masked",
+      "visible": "Visible",
+      "label": "PII",
+      "safeForSharing": "Safe for screen sharing"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "stats": {
+      "activeUsers": "Active Users",
+      "pendingApprovals": "Pending approvals",
+      "blockedUsers": "Blocked Users",
+      "pendingReview": "Pending Review",
+      "activeSessions": "Active Sessions",
+      "thisWeek": "+12% this week",
+      "requiresAttention": "Requires attention",
+      "awaitingApproval": "Awaiting review",
+      "awaitingModeration": "Sessions awaiting moderation",
+      "inProgress": "Currently in progress"
+    },
+    "recentSessions": "Recent Sessions",
+    "recentUsers": "Recent Users",
+    "messages": "messages",
+    "moderationProgress": "Moderation Progress",
+    "reviewed": "reviewed"
+  },
+  "group": {
+    "dashboard": {
+      "title": "Group Dashboard",
+      "welcome": "Welcome",
+      "groupLabel": "Group",
+      "unknownGroup": "Unknown",
+      "noGroup": "Select a group to view the dashboard",
+      "stats": {
+        "groupUsers": "Group users",
+        "activeUsers": "Active",
+        "blockedUsers": "Blocked users",
+        "sessionsTotal": "Sessions",
+        "activeSessions": "Active sessions",
+        "pendingReview": "Pending review"
+      },
+      "quickActions": {
+        "title": "Quick actions",
+        "subtitle": "Common group admin tasks",
+        "manageUsers": "Manage group users",
+        "viewChats": "View anonymized chats"
+      },
+      "security": {
+        "title": "Security boundary",
+        "notice": "You can only view and manage users and chats within your assigned group. Chats are always shown in anonymized form."
+      }
+    },
+    "users": {
+      "title": "Group Users",
+      "subtitle": "View and manage users in your group",
+      "invites": {
+        "title": "Invite codes",
+        "subtitle": "Generate an invite code for users to request access to this group",
+        "generate": "Generate invite code",
+        "copy": "Copy",
+        "copied": "Copied"
+      },
+      "requests": {
+        "title": "Join requests",
+        "subtitle": "Approve or reject users requesting access to this group",
+        "empty": "No pending requests",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "noGroup": "Select a group to view users",
+      "search": "Search by name or email...",
+      "addByEmail": "Add user by email",
+      "add": "Add to group",
+      "remove": "Remove",
+      "readOnly": "Read-only"
+    },
+    "sessions": {
+      "title": "Group Chats",
+      "subtitle": "Anonymized chat sessions scoped to your group",
+      "noGroup": "Select a group to view sessions",
+      "search": "Search by session ID...",
+      "emptyConversation": "No messages in this session yet",
+      "back": "Back to sessions"
+    }
+  },
+  "groups": {
+    "title": "Groups",
+    "subtitle": "Create and manage user groups",
+    "refresh": "Refresh",
+    "list": "All groups",
+    "create": "Create group",
+    "createPlaceholder": "New group name",
+    "details": "Group details",
+    "rename": "Rename",
+    "members": "Members",
+    "addMember": "Add member",
+    "addMemberPlaceholder": "user@example.com",
+    "memberRole": "Member",
+    "adminRole": "Admin",
+    "removeMember": "Remove member",
+    "noMembers": "No members found",
+    "invites": "Invitation codes",
+    "inviteCodePlaceholder": "INVITE123",
+    "createInvite": "Create invite",
+    "inviteExpires": "Expires {{date}}",
+    "inviteNoExpiry": "No expiry",
+    "inviteInactive": "Inactive",
+    "deactivateInvite": "Deactivate",
+    "noInvites": "No invitation codes",
+    "noGroupSelected": "Select a group to manage"
+  },
+  "approvals": {
+    "title": "Approvals",
+    "subtitle": "Approve or reject new access requests",
+    "refresh": "Refresh",
+    "empty": "No pending approvals",
+    "noGroup": "Select a group to view approvals",
+    "emptyHint": "Approvals appear when users request access.",
+    "emptyCta": "Open user management",
+    "commentLabel": "Approval comment (required for disapprove)",
+    "commentPlaceholder": "Add a note for the requester",
+    "commentRequired": "Comment is required to disapprove",
+    "approve": "Approve",
+    "disapprove": "Disapprove"
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage user accounts and permissions",
+    "search": "Search by name or email...",
+    "filters": {
+      "allRoles": "All Roles",
+      "allStatus": "All Status",
+      "active": "Active",
+      "blocked": "Blocked",
+      "pending": "Pending",
+      "approval": "Awaiting Approval",
+      "disapproved": "Disapproved",
+      "anonymized": "Anonymized",
+      "testUsersOnly": "Test users only"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastActive": "Last Active",
+      "actions": "Actions",
+      "view": "View",
+      "never": "Never",
+      "testUserBadge": "Test user"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "users": "users",
+      "page": "Page"
+    },
+    "empty": "No users found",
+    "sort": {
+      "ariaLabel": "Sort users",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "nameAsc": "Name (A→Z)",
+      "emailAsc": "Email (A→Z)",
+      "lastActive": "Last active (newest)",
+      "mostSessions": "Most sessions"
+    },
+    "pageSize": {
+      "ariaLabel": "Users per page"
+    },
+    "createUser": {
+      "title": "Create User",
+      "subtitle": "Add a new user to the system",
+      "button": "Add User",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "User name",
+      "role": "Role",
+      "status": "Status",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": "User created successfully",
+      "error": {
+        "emailRequired": "Email is required",
+        "displayNameRequired": "Display name is required",
+        "invalidEmail": "Invalid email format",
+        "emailExists": "A user with this email already exists",
+        "generic": "Failed to create user"
+      }
+    }
+  },
+  "userProfile": {
+    "backToList": "Back to User List",
+    "accountInfo": "Account Information",
+    "created": "Created",
+    "lastLogin": "Last Login",
+    "totalSessions": "Total Sessions",
+    "userId": "User ID",
+    "adminActions": "Administrative Actions",
+    "blockUser": "Block User",
+    "unblockUser": "Unblock User",
+    "changeRole": "Change Role",
+    "gdpr": {
+      "title": "GDPR Data Rights",
+      "description": "These actions support GDPR compliance for data portability and erasure.",
+      "downloadArchive": "Download Archive",
+      "executeErasure": "Execute Erasure",
+      "exportRequested": "Export requested. Job ID:",
+      "exportReady": "You will receive an email when the export is ready for download."
+    },
+    "erasure": {
+      "confirmTitle": "Confirm Data Erasure",
+      "cannotUndo": "This action cannot be undone",
+      "warning": "This will permanently anonymize all personal data for",
+      "reason": "Reason for erasure (required)",
+      "reasonPlaceholder": "Enter the reason for this data erasure request...",
+      "cancel": "Cancel",
+      "execute": "Execute Erasure"
+    },
+    "anonymized": {
+      "title": "Anonymized Account",
+      "description": "This user's data has been anonymized per GDPR erasure request. Personal information has been removed and cannot be recovered."
+    }
+  },
+  "research": {
+    "title": "Research & Moderation",
+    "subtitle": "Review and annotate chat sessions",
+    "search": "Search by session ID or user...",
+    "filters": {
+      "allStatus": "All Status",
+      "pending": "Pending",
+      "inReview": "In Review",
+      "moderated": "Moderated"
+    },
+    "session": {
+      "user": "User",
+      "anonymous": "Anonymous",
+      "messages": "messages",
+      "total": "sessions total",
+      "pendingReview": "pending review"
+    }
+  },
+  "moderation": {
+    "backToSessions": "Back",
+    "columns": {
+      "transcript": "Transcript",
+      "goldenReference": "Golden Reference",
+      "annotation": "Annotation"
+    },
+    "transcript": {
+      "messages": "messages"
+    },
+    "golden": {
+      "title": "Golden Reference",
+      "subtitle": "Ideal responses for training",
+      "placeholder": "Enter the ideal response for this message...",
+      "rlhfNote": "This will be used as training data for RLHF.",
+      "selectMessage": "Select a message from the transcript to add a golden reference",
+      "previous": "Previous Annotations",
+      "rating": "Rating"
+    },
+    "annotation": {
+      "title": "Annotation",
+      "subtitle": "Rate and tag this session",
+      "qualityRating": "Quality Rating",
+      "ratings": {
+        "poor": "Poor",
+        "fair": "Fair",
+        "good": "Good",
+        "veryGood": "Very Good",
+        "excellent": "Excellent"
+      },
+      "notes": "Notes",
+      "notesPlaceholder": "Add your observations and notes...",
+      "messageTags": "Message Tags",
+      "save": "Save Annotation",
+      "markComplete": "Mark as Complete"
+    },
+    "tags": {
+      "addTag": "Add Tag",
+      "sessionTags": "Session Tags",
+      "customTag": "Custom tag..."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Controls",
+    "subtitle": "GDPR compliance and data protection management",
+    "piiProtection": {
+      "title": "PII Protection",
+      "masked": "Personal data is masked for safe viewing",
+      "visible": "Personal data is currently visible"
+    },
+    "dataRequests": {
+      "title": "Data Requests",
+      "subtitle": "Active export and access requests",
+      "pending": "Pending"
+    },
+    "anonymizedRecords": {
+      "title": "Anonymized Records",
+      "subtitle": "users anonymized"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "bulkExport": "Bulk Export",
+      "bulkExportDesc": "Export all user data for audit",
+      "generateReport": "Generate Report",
+      "generateReportDesc": "Create GDPR compliance report",
+      "dataRetention": "Data Retention",
+      "dataRetentionDesc": "Review retention policies"
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "search": "Search logs...",
+      "columns": {
+        "action": "Action",
+        "targetUser": "Target User",
+        "performedBy": "Performed By",
+        "date": "Date",
+        "status": "Status"
+      },
+      "actions": {
+        "dataExport": "Data Export",
+        "dataErasure": "Data Erasure",
+        "piiAccess": "PII Access"
+      },
+      "status": {
+        "completed": "Completed",
+        "pending": "Pending"
+      }
+    },
+    "gdprCompliance": {
+      "title": "GDPR Compliance Status",
+      "description": "This system supports Article 15 (Right of Access), Article 17 (Right to Erasure), and Article 20 (Right to Data Portability). All data processing activities are logged for audit purposes."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences",
+    "showTechnicalDetails": "Show Technical Details",
+    "profile": {
+      "title": "Profile"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "piiMasking": "PII Masking",
+      "piiMaskingDesc": "Hide personal information in the Workbench"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "emailDesc": "Receive updates via email",
+      "browser": "Browser Notifications",
+      "browserDesc": "Show desktop notifications",
+      "digest": "Weekly Digest",
+      "digestDesc": "Summary of activity each week"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language & Region",
+      "language": "Language",
+      "timezone": "Timezone"
+    },
+    "admin": {
+      "title": "Admin Settings",
+      "subtitle": "Global controls for guest access and approvals",
+      "reload": "Reload",
+      "guestMode": "Guest Mode",
+      "guestModeDesc": "Allow unauthenticated users to start a chat",
+      "cooloffDays": "Approval Cooloff (days)",
+      "cooloffDaysDesc": "Days before a disapproved user can re-apply",
+      "save": "Save Admin Settings"
+    },
+    "save": "Save Changes"
+  },
+  "roles": {
+    "user": "User",
+    "qa_specialist": "QA Specialist",
+    "researcher": "Researcher",
+    "supervisor": "Supervisor",
+    "moderator": "Moderator",
+    "group_admin": "Group Admin",
+    "owner": "Owner"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "show": "Show",
+    "hide": "Hide",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "or": "or",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "signOut": "Sign Out",
+    "notFound": "Not found"
+  },
+  "survey": {
+    "freetext": {
+      "placeholder": "Type your answer...",
+      "placeholderNumber": "Enter a number..."
+    }
+  },
+  "surveyGate": {
+    "checking": "Checking for pending surveys...",
+    "retry": "Try Again",
+    "progress": "Question {{current}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "review": "Review answers",
+    "reviewTitle": "Review your answers",
+    "edit": "Edit",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "close": "Close",
+    "requiredError": "This question is required.",
+    "yes": "Yes",
+    "no": "No",
+    "noAnswer": "No answer",
+    "typeAnswer": "Type your answer...",
+    "submitError": "Submission failed. Please try again.",
+    "validation": {
+      "integerSigned": "Please enter a valid whole number",
+      "integerUnsigned": "Please enter a non-negative whole number",
+      "decimal": "Please enter a valid number",
+      "email": "Please enter a valid email address",
+      "phone": "Please enter a valid phone number",
+      "url": "Please enter a valid URL",
+      "postal_code": "Please enter a valid postal code",
+      "alphanumeric_code": "Please enter only letters and numbers"
+    }
+  }
+}
+

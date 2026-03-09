@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    @apply bg-neutral-50 text-neutral-700 antialiased;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-400 shadow-soft hover:shadow-soft-md;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-400 shadow-soft hover:shadow-soft-md;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-neutral-300 text-neutral-600 hover:bg-neutral-100 hover:border-neutral-400 focus:ring-neutral-300;
+  }
+  
+  .btn-ghost {
+    @apply btn text-neutral-600 hover:bg-neutral-100 focus:ring-neutral-300;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error text-white hover:opacity-90 focus:ring-error/50;
+  }
+  
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl border border-neutral-300 bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all duration-300 placeholder:text-neutral-400;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-neutral-200/60;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply badge bg-secondary-100 text-secondary-700;
+  }
+  
+  .badge-warning {
+    @apply badge bg-amber-50 text-amber-700;
+  }
+  
+  .badge-error {
+    @apply badge bg-red-50 text-error;
+  }
+  
+  .badge-info {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+}
+
+/* Custom scrollbar - softer */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-neutral-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-400;
+}
+
+/* Animations - smoother, gentler */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Prose styling for markdown - softer */
+.prose {
+  @apply text-neutral-700;
+}
+
+.prose strong {
+  @apply text-neutral-800 font-semibold;
+}
+
+.prose a {
+  @apply text-primary-600 hover:text-primary-700 transition-colors;
+}
+
+.prose code {
+  @apply bg-neutral-100 text-neutral-700 px-1.5 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply bg-neutral-100 text-neutral-700 rounded-xl p-4;
+}
+
+.prose ul, .prose ol {
+  @apply text-neutral-600;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary-200 pl-4 italic text-neutral-600;
+}
+
+/* Focus states - visible but gentle */
+*:focus-visible {
+  @apply outline-none ring-2 ring-primary-300 ring-offset-2;
+}
+
+/* Selection - warm tones */
+::selection {
+  @apply bg-primary-200 text-primary-900;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

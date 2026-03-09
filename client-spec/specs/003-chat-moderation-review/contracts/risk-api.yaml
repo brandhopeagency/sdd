@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: Risk Escalation API
+  version: 1.0.0
+  description: Endpoints for safety flag submission and escalation handling.
+servers:
+  - url: /api
+paths:
+  /review/sessions/{sessionId}/flag:
+    post:
+      summary: Submit a risk flag for a session
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitRiskFlagRequest"
+      responses:
+        "200":
+          description: Risk flag accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitRiskFlagResponse"
+        "400":
+          description: Invalid request
+  /review/escalations:
+    get:
+      summary: Get escalation queue (moderator+)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [open, acknowledged, resolved, escalated, all]
+            default: open
+        - in: query
+          name: severity
+          schema:
+            type: string
+            enum: [high, medium, low, all]
+            default: all
+      responses:
+        "200":
+          description: Escalation queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EscalationItem"
+  /review/escalations/{flagId}/acknowledge:
+    post:
+      summary: Acknowledge escalation
+      parameters:
+        - in: path
+          name: flagId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Escalation acknowledged
+  /review/escalations/{flagId}/resolve:
+    post:
+      summary: Resolve escalation
+      parameters:
+        - in: path
+          name: flagId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolutionNotes]
+              properties:
+                resolutionNotes:
+                  type: string
+                escalateFurther:
+                  type: boolean
+      responses:
+        "200":
+          description: Escalation resolution updated
+  /review/deanon-requests:
+    get:
+      summary: List deanonymization requests (commander/admin)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, denied, all]
+            default: pending
+      responses:
+        "200":
+          description: Deanonymization requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeanonymizationRequest"
+  /review/deanon-requests/{requestId}/resolve:
+    post:
+      summary: Approve or deny deanonymization request
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [approved, denied]
+                notes:
+                  type: string
+                expiresInHours:
+                  type: integer
+      responses:
+        "200":
+          description: Deanonymization request resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeanonymizationResolution"
+components:
+  schemas:
+    SubmitRiskFlagRequest:
+      type: object
+      required: [severity, reason]
+      properties:
+        severity:
+          type: string
+          enum: [high, medium, low]
+        reason:
+          type: string
+        details:
+          type: string
+        requestDeanonymization:
+          type: boolean
+        deanonymizationJustification:
+          type: string
+        deanonymizationDetails:
+          type: string
+    SubmitRiskFlagResponse:
+      type: object
+      properties:
+        flagId:
+          type: string
+        status:
+          type: string
+          enum: [open, acknowledged, resolved, escalated]
+        escalatedTo:
+          type: string
+        deanonymizationRequestId:
+          type: string
+          nullable: true
+    EscalationItem:
+      type: object
+      properties:
+        flagId:
+          type: string
+        sessionId:
+          type: string
+        anonymousUserId:
+          type: string
+        severity:
+          type: string
+          enum: [high, medium, low]
+        reason:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        deadlineAt:
+          type: string
+          format: date-time
+    DeanonymizationRequest:
+      type: object
+      properties:
+        requestId:
+          type: string
+        sessionId:
+          type: string
+        anonymousUserId:
+          type: string
+        requestedBy:
+          type: string
+        justification:
+          type: string
+        details:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, denied]
+        requestedAt:
+          type: string
+          format: date-time
+    DeanonymizationResolution:
+      type: object
+      properties:
+        requestId:
+          type: string
+        status:
+          type: string
+          enum: [approved, denied]
+        revealedUser:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+            unit:
+              type: string
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true

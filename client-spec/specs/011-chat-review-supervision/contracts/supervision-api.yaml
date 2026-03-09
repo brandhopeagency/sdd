@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: Supervision API
+  version: 1.0.0
+  description: Supervisor second-level review endpoints
+
+paths:
+  /api/review/supervision/queue:
+    get:
+      summary: List reviews awaiting supervision
+      description: Returns reviews submitted by reviewers that are pending supervisor evaluation. Supervisors self-select from this shared queue.
+      tags: [Supervision]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+        - name: groupId
+          in: query
+          schema: { type: string, format: uuid }
+          description: Filter by group
+        - name: sortBy
+          in: query
+          schema: { type: string, enum: [submittedAt, revisionIteration], default: submittedAt }
+        - name: sortOrder
+          in: query
+          schema: { type: string, enum: [asc, desc], default: asc }
+      responses:
+        '200':
+          description: Supervision queue items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/SupervisionQueueItem' }
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+        '403':
+          description: Requires REVIEW_SUPERVISE permission
+
+  /api/review/supervision/{reviewId}:
+    get:
+      summary: Get full supervision context for a review
+      description: Returns the chat transcript, reviewer assessment, and any prior supervisor decisions for a specific review. Powers the three-column supervisor interface.
+      tags: [Supervision]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Full supervision context
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SupervisionContext' }
+        '404':
+          description: Review not found or not pending supervision
+
+  /api/review/supervision/{reviewId}/decision:
+    post:
+      summary: Submit supervisor decision
+      description: Approve or disapprove a review with mandatory comments. On disapproval, optionally return to reviewer for revision (max 2 revision cycles).
+      tags: [Supervision]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SupervisorDecisionInput' }
+      responses:
+        '201':
+          description: Decision recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SupervisorReview' }
+        '400':
+          description: Validation error (e.g., empty comments, revision limit exceeded)
+        '403':
+          description: Requires REVIEW_SUPERVISE permission
+        '409':
+          description: Review already has a decision for this iteration
+
+  /api/review/supervision/awaiting-feedback:
+    get:
+      summary: List reviewer's own reviews pending supervision or returned for revision
+      description: For the authenticated reviewer, returns their submitted reviews that are pending supervisor evaluation or have been returned with supervisor feedback.
+      tags: [Supervision]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Reviewer's pending reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AwaitingFeedbackItem' }
+                  total: { type: integer }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SupervisionQueueItem:
+      type: object
+      required: [sessionReviewId, sessionId, reviewerId, reviewerName, submittedAt, revisionIteration, sessionMessageCount, groupName]
+      properties:
+        sessionReviewId: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        reviewerId: { type: string, format: uuid }
+        reviewerName: { type: string }
+        submittedAt: { type: string, format: date-time }
+        revisionIteration: { type: integer, minimum: 1, maximum: 3 }
+        sessionMessageCount: { type: integer }
+        groupName: { type: string }
+        supervisionStatus: { type: string, enum: [pending_supervision, revision_requested] }
+
+    SupervisionContext:
+      type: object
+      required: [review, messages, priorDecisions]
+      properties:
+        review:
+          description: The reviewer's full assessment
+          $ref: '#/components/schemas/ReviewAssessment'
+        messages:
+          description: Anonymized chat transcript with RAG details
+          type: array
+          items: { $ref: '#/components/schemas/AnonymizedMessage' }
+        priorDecisions:
+          description: Prior supervisor decisions for this review (across revision iterations)
+          type: array
+          items: { $ref: '#/components/schemas/SupervisorReview' }
+
+    ReviewAssessment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        reviewerId: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        averageScore: { type: number }
+        overallComment: { type: string, nullable: true }
+        messageRatings:
+          type: array
+          items:
+            type: object
+            properties:
+              messageId: { type: string, format: uuid }
+              score: { type: integer, minimum: 1, maximum: 10 }
+              comment: { type: string, nullable: true }
+              criteriaFeedback:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    criterionKey: { type: string, enum: [relevance, empathy, safety, ethics, clarity] }
+                    feedbackText: { type: string, nullable: true }
+
+    AnonymizedMessage:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        timestamp: { type: string, format: date-time }
+        ragDetails:
+          nullable: true
+          $ref: '#/components/schemas/RAGCallDetail'
+
+    SupervisorDecisionInput:
+      type: object
+      required: [decision, comments]
+      properties:
+        decision: { type: string, enum: [approved, disapproved] }
+        comments: { type: string, minLength: 1 }
+        returnToReviewer: { type: boolean, default: false }
+
+    SupervisorReview:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        sessionReviewId: { type: string, format: uuid }
+        supervisorId: { type: string, format: uuid }
+        decision: { type: string, enum: [approved, disapproved] }
+        comments: { type: string }
+        returnToReviewer: { type: boolean }
+        revisionIteration: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    AwaitingFeedbackItem:
+      type: object
+      properties:
+        sessionReviewId: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        supervisionStatus: { type: string, enum: [pending_supervision, revision_requested, approved, disapproved] }
+        latestSupervisorComment: { type: string, nullable: true }
+        revisionIteration: { type: integer }
+        submittedAt: { type: string, format: date-time }
+
+    RAGCallDetail:
+      type: object
+      properties:
+        retrievalQuery: { type: string }
+        retrievedDocuments:
+          type: array
+          items:
+            type: object
+            properties:
+              title: { type: string }
+              relevanceScore: { type: number, minimum: 0, maximum: 1 }
+              contentSnippet: { type: string }
+        retrievalTimestamp: { type: string, format: date-time }

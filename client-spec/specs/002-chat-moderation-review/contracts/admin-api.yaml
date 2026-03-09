@@ -1,0 +1,588 @@
+openapi: 3.1.0
+info:
+  title: Chat Moderation & Review API — Admin, Dashboard & Reporting
+  version: 1.0.0
+  description: |
+    API endpoints for review configuration, reviewer dashboards,
+    team statistics, notifications, and report generation.
+
+servers:
+  - url: /api/review
+    description: Review API base path
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ReviewConfiguration:
+      type: object
+      properties:
+        minReviews:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 3
+        maxReviews:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 5
+        criteriaThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 7
+          description: Score at or below which criteria feedback is required
+        autoFlagThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 4
+          description: Score at or below which auto-flag to moderator is triggered
+        varianceLimit:
+          type: number
+          format: float
+          minimum: 0.5
+          maximum: 5.0
+          default: 2.0
+          description: Score variance limit for dispute detection
+        timeoutHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+          default: 24
+          description: Hours before review assignment expires
+        highRiskSlaHours:
+          type: integer
+          minimum: 1
+          maximum: 48
+          default: 2
+        mediumRiskSlaHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+          default: 24
+        deanonymizationAccessHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+          default: 24
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+          nullable: true
+
+    UpdateConfigInput:
+      type: object
+      properties:
+        minReviews:
+          type: integer
+          minimum: 1
+          maximum: 10
+        maxReviews:
+          type: integer
+          minimum: 1
+          maximum: 20
+        criteriaThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        autoFlagThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        varianceLimit:
+          type: number
+          format: float
+          minimum: 0.5
+          maximum: 5.0
+        timeoutHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+        highRiskSlaHours:
+          type: integer
+          minimum: 1
+          maximum: 48
+        mediumRiskSlaHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+        deanonymizationAccessHours:
+          type: integer
+          minimum: 1
+          maximum: 168
+
+    ReviewerDashboard:
+      type: object
+      properties:
+        reviewerId:
+          type: string
+          format: uuid
+        reviewerName:
+          type: string
+        period:
+          type: string
+          enum: [today, week, month, all]
+        stats:
+          type: object
+          properties:
+            reviewsCompleted:
+              type: integer
+            averageScoreGiven:
+              type: number
+              format: float
+              nullable: true
+            agreementRate:
+              type: number
+              format: float
+              description: Percentage of scores within variance threshold of session median
+            scoreDistribution:
+              type: object
+              description: Count of scores given in each range
+              properties:
+                outstanding:
+                  type: integer
+                  description: "Scores 9-10"
+                good:
+                  type: integer
+                  description: "Scores 7-8"
+                adequate:
+                  type: integer
+                  description: "Scores 5-6"
+                poor:
+                  type: integer
+                  description: "Scores 3-4"
+                unsafe:
+                  type: integer
+                  description: "Scores 1-2"
+            criteriaFeedbackCounts:
+              type: object
+              properties:
+                relevance:
+                  type: integer
+                empathy:
+                  type: integer
+                safety:
+                  type: integer
+                ethics:
+                  type: integer
+                clarity:
+                  type: integer
+            weeklyTrend:
+              type: array
+              items:
+                type: object
+                properties:
+                  week:
+                    type: string
+                    format: date
+                  reviewsCompleted:
+                    type: integer
+                  averageScore:
+                    type: number
+                    format: float
+
+    TeamDashboard:
+      type: object
+      properties:
+        period:
+          type: string
+          enum: [today, week, month, all]
+        stats:
+          type: object
+          properties:
+            totalReviews:
+              type: integer
+            averageTeamScore:
+              type: number
+              format: float
+              nullable: true
+            interRaterReliability:
+              type: number
+              format: float
+              description: Percentage of sessions within variance threshold
+            pendingEscalations:
+              type: integer
+            pendingDeanonymizations:
+              type: integer
+            reviewerWorkload:
+              type: array
+              items:
+                type: object
+                properties:
+                  reviewerId:
+                    type: string
+                    format: uuid
+                  reviewerName:
+                    type: string
+                  reviewsCompleted:
+                    type: integer
+                  reviewsInProgress:
+                    type: integer
+                  averageScore:
+                    type: number
+                    format: float
+            queueDepth:
+              type: object
+              properties:
+                pendingReview:
+                  type: integer
+                inReview:
+                  type: integer
+                disputed:
+                  type: integer
+                complete:
+                  type: integer
+
+    NotificationItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        data:
+          type: object
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    BannerAlerts:
+      type: object
+      properties:
+        highRiskEscalations:
+          type: integer
+          description: Unresolved high-risk escalations (moderators)
+        pendingDeanonymizations:
+          type: integer
+          description: Pending deanonymization requests (commanders)
+        overdueSlaCounts:
+          type: integer
+          description: Flags past SLA deadline
+
+    ReportMetadata:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [daily_summary, weekly_performance, monthly_quality, escalation_report]
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        generatedAt:
+          type: string
+          format: date-time
+
+    SessionAssignment:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        reviewerId:
+          type: string
+          format: uuid
+        assignedBy:
+          type: string
+          format: uuid
+        expiresAt:
+          type: string
+          format: date-time
+
+    AssignSessionInput:
+      type: object
+      required: [reviewerId]
+      properties:
+        reviewerId:
+          type: string
+          format: uuid
+
+    PaginatedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+paths:
+  # --- Configuration ---
+  /config:
+    get:
+      summary: Get current review configuration
+      operationId: getReviewConfig
+      tags: [Configuration]
+      responses:
+        '200':
+          description: Current configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewConfiguration'
+
+    put:
+      summary: Update review configuration
+      description: |
+        Admin-only. Updates system-wide review settings. Changes apply
+        to new reviews only; in-progress reviews retain their config snapshot.
+      operationId: updateReviewConfig
+      tags: [Configuration]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConfigInput'
+      responses:
+        '200':
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewConfiguration'
+        '403':
+          description: Not an admin
+
+  # --- Dashboard ---
+  /dashboard/me:
+    get:
+      summary: Get personal reviewer dashboard
+      operationId: getMyDashboard
+      tags: [Dashboard]
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: week
+      responses:
+        '200':
+          description: Personal dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewerDashboard'
+
+  /dashboard/team:
+    get:
+      summary: Get team dashboard
+      description: |
+        Available to senior reviewers (RESEARCHER role) and above. Shows
+        team-level statistics including review volume, inter-rater reliability,
+        and workload distribution.
+      operationId: getTeamDashboard
+      tags: [Dashboard]
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: week
+      responses:
+        '200':
+          description: Team dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamDashboard'
+        '403':
+          description: Insufficient permissions (requires senior reviewer or above)
+
+  # --- Notifications ---
+  /notifications:
+    get:
+      summary: Get notifications for current user
+      operationId: getNotifications
+      tags: [Notifications]
+      parameters:
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated notifications
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NotificationItem'
+                      unreadCount:
+                        type: integer
+
+  /notifications/banners:
+    get:
+      summary: Get persistent banner alerts
+      description: |
+        Returns counts for banner alerts based on user role.
+        Moderators see high-risk escalation count.
+        Commanders see pending deanonymization count.
+      operationId: getBannerAlerts
+      tags: [Notifications]
+      responses:
+        '200':
+          description: Banner alert counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BannerAlerts'
+
+  /notifications/{notificationId}/read:
+    patch:
+      summary: Mark notification as read
+      operationId: markNotificationRead
+      tags: [Notifications]
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /notifications/read-all:
+    post:
+      summary: Mark all notifications as read
+      operationId: markAllNotificationsRead
+      tags: [Notifications]
+      responses:
+        '200':
+          description: All notifications marked as read
+
+  # --- Queue Assignment ---
+  /sessions/{sessionId}/assign:
+    post:
+      summary: Assign session to a reviewer
+      description: |
+        Moderator-only. Manually assigns a session to a specific reviewer.
+        Creates a 24-hour reservation. Unstarted assignments expire and
+        return to the pool.
+      operationId: assignSession
+      tags: [Queue Management]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignSessionInput'
+      responses:
+        '200':
+          description: Session assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionAssignment'
+        '409':
+          description: Session already assigned to this reviewer
+
+  # --- Reports ---
+  /reports/{reportType}:
+    get:
+      summary: Generate a report
+      description: |
+        Generates a report on-demand for the specified type and date range.
+        Available formats: JSON (default), CSV, PDF.
+      operationId: generateReport
+      tags: [Reports]
+      parameters:
+        - name: reportType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [daily_summary, weekly_performance, monthly_quality, escalation_report]
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv, pdf]
+            default: json
+      responses:
+        '200':
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/ReportMetadata'
+                  data:
+                    type: object
+                    description: Report-specific data structure
+            text/csv:
+              schema:
+                type: string
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Insufficient permissions

@@ -1,0 +1,264 @@
+name: Manual Rollback (Backend)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to rollback"
+        required: true
+        default: "prod"
+        type: choice
+        options:
+          - dev
+          - prod
+      mode:
+        description: "Rollback target selection mode"
+        required: true
+        default: "auto_previous"
+        type: choice
+        options:
+          - auto_previous
+          - manual_ref
+      target_ref:
+        description: "Tag or SHA to rollback to (required for manual_ref)"
+        required: false
+        type: string
+
+env:
+  GCP_REGION: europe-west1
+  ARTIFACT_REGISTRY: chat-backend
+  RELEASE_TAG_PATTERN: "v*-backend.*"
+
+concurrency:
+  group: rollback-backend-${{ github.event.inputs.environment || 'prod' }}
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    name: Setup rollback context
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      cloud_run_service: ${{ steps.set-env.outputs.cloud_run_service }}
+      mode: ${{ steps.set-mode.outputs.mode }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          if [ -z "$ENV" ]; then ENV="prod"; fi
+
+          if [ "$ENV" = "prod" ]; then
+            SERVICE="chat-backend"
+          else
+            SERVICE="chat-backend-dev"
+          fi
+
+          echo "environment=$ENV" >> "$GITHUB_OUTPUT"
+          echo "cloud_run_service=$SERVICE" >> "$GITHUB_OUTPUT"
+
+      - name: Determine rollback mode
+        id: set-mode
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ -z "$MODE" ]; then MODE="auto_previous"; fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+
+      - name: Rollback request summary
+        run: |
+          echo "### Rollback Request" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Requested by: **${{ github.actor }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: **${{ steps.set-env.outputs.environment }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Cloud Run Service: **${{ steps.set-env.outputs.cloud_run_service }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: **${{ steps.set-mode.outputs.mode }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Manual target input: **${{ github.event.inputs.target_ref || 'n/a' }}**" >> "$GITHUB_STEP_SUMMARY"
+
+  resolve-target:
+    name: Resolve rollback target
+    runs-on: ubuntu-latest
+    needs: [setup]
+    outputs:
+      resolved_ref: ${{ steps.resolve.outputs.resolved_ref }}
+      resolved_sha: ${{ steps.resolve.outputs.resolved_sha }}
+      from_ref: ${{ steps.resolve.outputs.from_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Resolve target ref
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODE="${{ needs.setup.outputs.mode }}"
+          INPUT_REF="${{ github.event.inputs.target_ref }}"
+          PATTERN="${{ env.RELEASE_TAG_PATTERN }}"
+
+          mapfile -t TAGS < <(git tag --list "$PATTERN" --sort=-creatordate)
+
+          if [ "${#TAGS[@]}" -gt 0 ]; then
+            CURRENT_TAG="${TAGS[0]}"
+          else
+            CURRENT_TAG="unknown"
+          fi
+
+          if [ "$MODE" = "manual_ref" ]; then
+            if [ -z "$INPUT_REF" ]; then
+              echo "::error::target_ref is required when mode=manual_ref"
+              exit 1
+            fi
+            git rev-parse --verify "${INPUT_REF}^{commit}" >/dev/null
+            RESOLVED_REF="$INPUT_REF"
+          else
+            if [ "${#TAGS[@]}" -lt 2 ]; then
+              echo "::error::Auto rollback requires at least two release tags matching pattern '$PATTERN'. Use mode=manual_ref."
+              exit 1
+            fi
+            RESOLVED_REF="${TAGS[1]}"
+          fi
+
+          RESOLVED_SHA="$(git rev-parse "${RESOLVED_REF}^{commit}")"
+
+          echo "resolved_ref=$RESOLVED_REF" >> "$GITHUB_OUTPUT"
+          echo "resolved_sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
+          echo "from_ref=$CURRENT_TAG" >> "$GITHUB_OUTPUT"
+
+          echo "### Resolved Rollback Target" >> "$GITHUB_STEP_SUMMARY"
+          echo "- From: **$CURRENT_TAG**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- To ref: **$RESOLVED_REF**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- To SHA: \`$RESOLVED_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-rollback:
+    name: Execute backend rollback
+    runs-on: ubuntu-latest
+    needs: [setup, resolve-target]
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-target.outputs.resolved_ref }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-types
+          path: chat-types
+          token: ${{ secrets.PKG_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+
+      - name: Build chat-types locally
+        run: cd chat-types && npm install && npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${SERVICE}:${{ needs.resolve-target.outputs.resolved_sha }}"
+          docker build \
+            --build-arg GITHUB_TOKEN=${{ secrets.PKG_TOKEN }} \
+            -t "$IMAGE" .
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Push Docker image
+        run: docker push "$IMAGE"
+
+      - name: Deploy to Cloud Run
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+
+          VERTEX_MODEL="${{ vars.VERTEX_MODEL }}"
+          if [ -z "$VERTEX_MODEL" ] || [ "$VERTEX_MODEL" = "gemini-1.5-flash" ]; then
+            VERTEX_MODEL="publishers/google/models/gemini-2.5-flash-lite"
+          fi
+          VERTEX_LOCATION="${{ vars.VERTEX_LOCATION }}"
+          if [ -z "$VERTEX_LOCATION" ]; then
+            VERTEX_LOCATION="us-central1"
+          fi
+
+          CLOUD_SQL_FLAG=""
+          if [ -n "${{ vars.CLOUD_SQL_CONNECTION }}" ]; then
+            CLOUD_SQL_FLAG="--add-cloudsql-instances=${{ vars.CLOUD_SQL_CONNECTION }}"
+          fi
+
+          gcloud run deploy $SERVICE \
+            --image="${IMAGE}" \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            $CLOUD_SQL_FLAG \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="FRONTEND_URL=${{ vars.FRONTEND_URL }}" \
+            --set-env-vars="DIALOGFLOW_PROJECT_ID=${{ vars.DIALOGFLOW_PROJECT_ID }}" \
+            --set-env-vars="DIALOGFLOW_AGENT_ID=${{ vars.DIALOGFLOW_AGENT_ID }}" \
+            --set-env-vars="DIALOGFLOW_LOCATION=${{ vars.DIALOGFLOW_LOCATION }}" \
+            --set-env-vars="LLM_PROVIDER=${{ vars.LLM_PROVIDER }}" \
+            --set-env-vars="VERTEX_PROJECT_ID=${{ vars.VERTEX_PROJECT_ID }}" \
+            --set-env-vars="VERTEX_LOCATION=${VERTEX_LOCATION}" \
+            --set-env-vars="VERTEX_MODEL=${VERTEX_MODEL}" \
+            --set-env-vars="EMAIL_PROVIDER=${{ vars.EMAIL_PROVIDER }}" \
+            --set-env-vars="EMAIL_FROM=${{ vars.EMAIL_FROM }}" \
+            --set-env-vars="GMAIL_CLIENT_ID=${{ vars.GMAIL_CLIENT_ID }}" \
+            --set-env-vars="GCS_BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" \
+            --set-secrets="DATABASE_URL=database-url:latest" \
+            --set-secrets="JWT_SECRET=jwt-secret:latest" \
+            --set-secrets="JWT_REFRESH_SECRET=jwt-refresh-secret:latest" \
+            --set-secrets="GMAIL_CLIENT_SECRET=gmail-client-secret:latest" \
+            --set-secrets="GMAIL_REFRESH_TOKEN=gmail-refresh-token:latest" \
+            --min-instances=0 \
+            --max-instances=10 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=60
+
+      - name: Output service URL
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          URL=$(gcloud run services describe "$SERVICE" \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.url)')
+          echo "service_url=$URL" >> "$GITHUB_ENV"
+          echo "### Backend rollback deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Service: **$SERVICE**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: $URL" >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: Post-rollback report
+    runs-on: ubuntu-latest
+    needs: [setup, resolve-target, deploy-rollback]
+    if: always()
+    steps:
+      - name: Rollback summary
+        run: |
+          echo "### Rollback Result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: **${{ needs.deploy-rollback.result }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Requested by: **${{ github.actor }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: **${{ needs.setup.outputs.environment }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: **${{ needs.setup.outputs.mode }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- From ref: **${{ needs.resolve-target.outputs.from_ref }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- To ref: **${{ needs.resolve-target.outputs.resolved_ref }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- To SHA: \`${{ needs.resolve-target.outputs.resolved_sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> "$GITHUB_STEP_SUMMARY"

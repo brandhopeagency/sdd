@@ -1,0 +1,56 @@
+# ============================================================================
+# Reusable CI snippet: Checkout & build @mentalhelpglobal/chat-types
+# ============================================================================
+# Copy this block into any GitHub Actions job that depends on chat-types.
+# Place it AFTER actions/checkout@v4 and BEFORE your npm install step.
+#
+# Prerequisites:
+#   - Repository secret PKG_TOKEN with `repo` + `read:packages` scopes
+#   - .npmrc configured: @mentalhelpglobal:registry=https://npm.pkg.github.com
+#   - package.json has: "@mentalhelpglobal/chat-types": "file:../chat-types"
+#
+# What it does:
+#   1. Checks out chat-types repo (default branch) into ./chat-types
+#   2. Builds it (npm install + npm run build)
+#   3. Overrides the file: dependency to point to ./chat-types (not ../chat-types)
+#   4. Runs npm install with the overridden path
+#
+# ============================================================================
+
+# Step 1: Checkout chat-types
+- uses: actions/checkout@v4
+  with:
+    repository: MentalHelpGlobal/chat-types
+    path: chat-types
+    token: ${{ secrets.PKG_TOKEN }}
+
+# Step 2: Build chat-types
+- name: Build chat-types locally
+  run: cd chat-types && npm install && npm run build
+
+# Step 3+4: Override dependency path and install
+- name: Install dependencies
+  run: |
+    npm pkg set "dependencies.@mentalhelpglobal/chat-types=file:./chat-types"
+    npm install
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+    GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}
+
+# ============================================================================
+# Additional notes:
+#
+# ESLint: If your CI runs eslint, exclude the checked-out chat-types:
+#   run: npx eslint --ignore-pattern 'chat-types/**' .
+#
+# Vite build: If your project uses Vite, add to vite.config.ts:
+#   build: {
+#     commonjsOptions: {
+#       include: [/chat-types/, /node_modules/],
+#     },
+#   },
+#
+# Docker: If building a Docker image, copy chat-types into the context:
+#   COPY chat-types/ ./chat-types/
+#   RUN npm install  # (not npm ci — lockfile was modified)
+# ============================================================================

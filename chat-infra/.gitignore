@@ -1,0 +1,11 @@
+*.exe
+*.key
+*.json
+!package*.json
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example
+.env
+.env.*

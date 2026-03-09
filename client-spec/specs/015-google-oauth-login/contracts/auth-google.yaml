@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: Google OAuth Authentication API
+  description: API endpoints for Google OAuth login flow and OTP disable setting
+  version: 1.0.0
+
+paths:
+  /api/auth/google:
+    post:
+      summary: Authenticate via Google OAuth
+      description: |
+        Verifies a Google ID token (credential) returned by the Google Identity
+        Services library. If the email matches an existing user, links the Google
+        identity and returns session tokens. If no match, creates a new user
+        following the approval workflow.
+      operationId: authenticateWithGoogle
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - credential
+                - surface
+              properties:
+                credential:
+                  type: string
+                  description: Google ID token from GSI callback
+                invitationCode:
+                  type: string
+                  description: Optional group invitation code
+                  pattern: "^[A-Z0-9]+$"
+                surface:
+                  type: string
+                  enum: [chat, workbench]
+                  description: Which application surface the login is from
+      responses:
+        "200":
+          description: Authentication successful
+          headers:
+            Set-Cookie:
+              description: httpOnly refresh token cookie on parent domain
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token (same format as OTP flow)
+                  user:
+                    $ref: "#/components/schemas/AuthenticatedUser"
+        "400":
+          description: Invalid or expired Google ID token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: User account is blocked or disapproved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "202":
+          description: Account created but pending approval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [approval, pending]
+                  message:
+                    type: string
+
+  /api/auth/otp/send:
+    post:
+      summary: Send OTP code (updated)
+      description: |
+        Existing endpoint with added `surface` parameter. When
+        `otpLoginDisabledWorkbench` is true and surface is `workbench`,
+        the endpoint returns 403.
+      operationId: sendOtp
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                surface:
+                  type: string
+                  enum: [chat, workbench]
+                  description: Added field — identifies calling surface for OTP disable enforcement
+      responses:
+        "200":
+          description: OTP sent successfully
+        "403":
+          description: OTP login disabled for this surface
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/auth/google/config:
+    get:
+      summary: Get Google OAuth client configuration
+      description: |
+        Returns the Google OAuth client ID for frontend initialization.
+        No authentication required. Returns empty/null if Google OAuth
+        is not configured (e.g., dev environment without credentials).
+      operationId: getGoogleAuthConfig
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: Google OAuth configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientId:
+                    type: string
+                    nullable: true
+                    description: Google OAuth client ID (null if not configured)
+                  available:
+                    type: boolean
+                    description: Whether Google OAuth is available
+
+  /api/admin/settings:
+    patch:
+      summary: Update admin settings (updated)
+      description: |
+        Existing endpoint with added `otpLoginDisabledWorkbench` field.
+        Owner-only access.
+      operationId: updateSettings
+      tags:
+        - Admin Settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guestModeEnabled:
+                  type: boolean
+                approvalCooloffDays:
+                  type: integer
+                  minimum: 0
+                otpLoginDisabledWorkbench:
+                  type: boolean
+                  description: Added field — disable OTP login for workbench
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+        "403":
+          description: Not authorized (Owner role required)
+
+  /api/public/settings:
+    get:
+      summary: Get public settings (updated)
+      description: |
+        Existing endpoint with added `otpLoginDisabledWorkbench` and
+        `googleOAuthAvailable` fields. No authentication required.
+      operationId: getPublicSettings
+      tags:
+        - Public
+      responses:
+        "200":
+          description: Public settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicSettings"
+
+components:
+  schemas:
+    AuthenticatedUser:
+      type: object
+      description: Full user object with permissions (existing schema)
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+
+    AppSettings:
+      type: object
+      properties:
+        guestModeEnabled:
+          type: boolean
+        approvalCooloffDays:
+          type: integer
+        otpLoginDisabledWorkbench:
+          type: boolean
+
+    PublicSettings:
+      type: object
+      properties:
+        guestModeEnabled:
+          type: boolean
+        approvalCooloffDays:
+          type: integer
+          nullable: true
+        otpLoginDisabledWorkbench:
+          type: boolean
+        googleOAuthAvailable:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

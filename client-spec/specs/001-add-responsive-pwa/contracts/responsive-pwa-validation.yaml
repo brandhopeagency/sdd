@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: Responsive and PWA Validation Contract
+  version: 1.0.0
+  description: >
+    Validation-oriented contract for feature 001-add-responsive-pwa.
+    This contract defines evidence payloads and pass criteria used by
+    QA/release workflows rather than introducing new public runtime APIs.
+servers:
+  - url: https://dev.mentalhelp.chat
+    description: Development frontend host
+  - url: https://mentalhelp.chat
+    description: Production frontend host
+paths:
+  /contracts/validation/responsive:
+    post:
+      summary: Record responsive validation run evidence
+      description: >
+        Captures pass/fail outcomes for core journeys across viewport classes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsiveValidationEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+        '400':
+          description: Invalid evidence payload
+  /contracts/validation/pwa:
+    post:
+      summary: Record PWA installability evidence
+      description: >
+        Captures supported and unsupported platform behavior, install path,
+        and post-install launch verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PwaValidationEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+        '400':
+          description: Invalid evidence payload
+  /contracts/validation/release-smoke:
+    post:
+      summary: Record post-deploy smoke evidence
+      description: >
+        Captures console/network regression evidence and checks for critical
+        routes, deep links, and key API endpoints.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReleaseSmokeEvidence'
+      responses:
+        '200':
+          description: Evidence accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationAck'
+        '400':
+          description: Invalid evidence payload
+components:
+  schemas:
+    ValidationAck:
+      type: object
+      required:
+        - accepted
+        - evidenceId
+      properties:
+        accepted:
+          type: boolean
+          example: true
+        evidenceId:
+          type: string
+          description: Unique identifier for traceability.
+    ResponsiveValidationEvidence:
+      type: object
+      required:
+        - buildRef
+        - viewportResults
+      properties:
+        buildRef:
+          type: string
+        viewportResults:
+          type: array
+          minItems: 3
+          items:
+            $ref: '#/components/schemas/ViewportResult'
+        notes:
+          type: string
+    ViewportResult:
+      type: object
+      required:
+        - viewportClass
+        - coreJourneysPassed
+        - failures
+      properties:
+        viewportClass:
+          type: string
+          enum: [phone, tablet, desktop]
+        coreJourneysPassed:
+          type: boolean
+        failures:
+          type: array
+          items:
+            type: string
+    PwaValidationEvidence:
+      type: object
+      required:
+        - buildRef
+        - platformResults
+      properties:
+        buildRef:
+          type: string
+        platformResults:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/PwaPlatformResult'
+        notes:
+          type: string
+    PwaPlatformResult:
+      type: object
+      required:
+        - platform
+        - installSupported
+        - installOutcome
+        - fallbackVerified
+      properties:
+        platform:
+          type: string
+          example: android-chromium
+        installSupported:
+          type: boolean
+        installOutcome:
+          type: string
+          enum: [installed, unavailable, failed]
+        fallbackVerified:
+          type: boolean
+    ReleaseSmokeEvidence:
+      type: object
+      required:
+        - deployRef
+        - routeChecks
+        - apiChecks
+        - regressionSignals
+      properties:
+        deployRef:
+          type: string
+        routeChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointCheck'
+        apiChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointCheck'
+        regressionSignals:
+          type: array
+          description: Non-static network anomalies and console errors.
+          items:
+            type: string
+    EndpointCheck:
+      type: object
+      required:
+        - url
+        - statusCode
+        - passed
+      properties:
+        url:
+          type: string
+        statusCode:
+          type: integer
+          minimum: 100
+          maximum: 599
+        passed:
+          type: boolean

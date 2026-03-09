@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: Grade Description API
+  version: 1.0.0
+  description: CRUD for score level descriptions displayed as tooltips in the grading interface
+
+paths:
+  /api/review/grade-descriptions:
+    get:
+      summary: List all grade descriptions
+      description: Returns descriptions for all 10 score levels (1-10). Public to all authenticated review users.
+      tags: [GradeDescriptions]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All 10 grade descriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GradeDescription' }
+                minItems: 10
+                maxItems: 10
+
+  /api/review/grade-descriptions/{scoreLevel}:
+    put:
+      summary: Update a grade description
+      description: Update the description text for a specific score level. Requires REVIEW_SUPERVISION_CONFIG or REVIEW_CONFIGURE permission.
+      tags: [GradeDescriptions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scoreLevel
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1, maximum: 10 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [description]
+              properties:
+                description: { type: string, minLength: 1, maxLength: 1000 }
+      responses:
+        '200':
+          description: Updated grade description
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GradeDescription' }
+        '400':
+          description: Invalid score level or empty description
+        '403':
+          description: Requires supervisor or admin permissions
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GradeDescription:
+      type: object
+      required: [scoreLevel, description, updatedAt]
+      properties:
+        scoreLevel: { type: integer, minimum: 1, maximum: 10 }
+        description: { type: string }
+        updatedBy: { type: string, format: uuid, nullable: true }
+        updatedAt: { type: string, format: date-time }

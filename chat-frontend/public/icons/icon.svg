@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
+  <defs>
+    <linearGradient id="mhg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c8db0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5a6a8a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Circle background -->
+  <circle cx="256" cy="256" r="240" fill="url(#mhg-gradient)" stroke="#5a6a8a" stroke-width="8"/>
+  <!-- Chat bubble -->
+  <path d="M160 180c0-22 18-40 40-40h112c22 0 40 18 40 40v120c0 22-18 40-40 40H220l-60 60V180z" fill="#faf8f6" stroke="#5a6a8a" stroke-width="4"/>
+  <!-- Heart -->
+  <path d="M256 340c-12-10-28-24-28-44 0-18 14-32 32-32 10 0 19 5 25 12 6-7 15-12 25-12 18 0 32 14 32 32 0 20-16 34-28 44-4 3-8 6-12 9-4-3-8-6-12-9z" fill="#e8a4b8" stroke="#c97a8e" stroke-width="3"/>
+</svg>

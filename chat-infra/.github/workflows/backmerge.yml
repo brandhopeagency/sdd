@@ -1,0 +1,11 @@
+name: Backmerge main → develop
+on:
+  push:
+    branches: [main]
+
+jobs:
+  backmerge:
+    uses: MentalHelpGlobal/chat-ci/.github/workflows/backmerge.yml@main
+    permissions:
+      contents: write
+      pull-requests: write

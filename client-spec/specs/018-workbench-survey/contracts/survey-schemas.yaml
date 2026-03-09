@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: Survey Schemas API
+  version: 1.0.0
+  description: Workbench endpoints for survey schema management
+
+paths:
+  /api/workbench/survey-schemas:
+    get:
+      summary: List survey schemas
+      description: Returns schemas filtered by status. Default excludes archived.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, archived]
+          description: Filter by status. Omit to exclude archived.
+      responses:
+        '200':
+          description: List of schemas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SurveySchemaListItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      summary: Create draft schema
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 1000
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SurveyQuestionInput'
+      responses:
+        '201':
+          description: Schema created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveySchema'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/workbench/survey-schemas/{id}:
+    get:
+      summary: Get schema detail
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '200':
+          description: Schema detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveySchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update draft schema
+      description: Only allowed when status is draft. Returns 403 if published or archived.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 1000
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SurveyQuestionInput'
+      responses:
+        '200':
+          description: Schema updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveySchema'
+        '403':
+          description: Schema is published or archived — immutable
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete draft schema
+      description: Only allowed when status is draft and no instances exist.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '200':
+          description: Schema deleted
+        '403':
+          description: Schema is not in draft status
+        '409':
+          description: Schema has existing instances — cannot delete
+
+  /api/workbench/survey-schemas/{id}/publish:
+    post:
+      summary: Publish draft schema
+      description: Requires at least 1 question. Irreversible.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '200':
+          description: Schema published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveySchema'
+        '403':
+          description: Schema is not in draft status
+        '422':
+          description: Schema has zero questions
+
+  /api/workbench/survey-schemas/{id}/archive:
+    post:
+      summary: Archive published schema
+      description: Admin only. Hides from default listings.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '200':
+          description: Schema archived
+        '403':
+          description: Not authorized or schema not published
+
+  /api/workbench/survey-schemas/{id}/restore:
+    post:
+      summary: Restore archived schema to draft
+      description: Admin only.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '200':
+          description: Schema restored to draft
+        '403':
+          description: Not authorized or schema not archived
+
+  /api/workbench/survey-schemas/{id}/clone:
+    post:
+      summary: Clone schema to new draft
+      description: Available on any status. Creates independent copy.
+      tags: [Survey Schemas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SchemaId'
+      responses:
+        '201':
+          description: New draft schema created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveySchema'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    SchemaId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+    Forbidden:
+      description: Insufficient permissions
+    NotFound:
+      description: Resource not found
+
+  schemas:
+    SurveySchema:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [draft, published, archived]
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurveyQuestion'
+        clonedFromId:
+          type: string
+          format: uuid
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        archivedAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+
+    SurveySchemaListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, published, archived]
+        questionCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    SurveyQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        order:
+          type: integer
+          minimum: 1
+        type:
+          type: string
+          enum: [free_text, single_choice, multi_choice, boolean]
+        text:
+          type: string
+          maxLength: 500
+        required:
+          type: boolean
+        options:
+          type: array
+          items:
+            type: string
+          nullable: true
+        validation:
+          type: object
+          nullable: true
+          properties:
+            regex:
+              type: string
+              nullable: true
+            minLength:
+              type: integer
+              nullable: true
+            maxLength:
+              type: integer
+              nullable: true
+        riskFlag:
+          type: boolean
+
+    SurveyQuestionInput:
+      type: object
+      required: [type, text]
+      properties:
+        id:
+          type: string
+          format: uuid
+        order:
+          type: integer
+          minimum: 1
+        type:
+          type: string
+          enum: [free_text, single_choice, multi_choice, boolean]
+        text:
+          type: string
+          maxLength: 500
+        required:
+          type: boolean
+          default: true
+        options:
+          type: array
+          items:
+            type: string
+          nullable: true
+        validation:
+          type: object
+          nullable: true
+          properties:
+            regex:
+              type: string
+            minLength:
+              type: integer
+            maxLength:
+              type: integer
+        riskFlag:
+          type: boolean
+          default: false

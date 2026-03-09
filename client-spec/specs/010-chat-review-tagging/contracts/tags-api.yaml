@@ -1,0 +1,711 @@
+openapi: 3.0.3
+info:
+  title: Chat Review Tagging API
+  description: |
+    API for managing user and chat tags within the Chat Moderation & Review System.
+    Extends the existing review API (spec 002) with tag management, assignment,
+    and queue filtering capabilities.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development
+
+paths:
+  # ── Tag Definition Management (Admin) ──────────────────────────────────────
+
+  /admin/tags:
+    get:
+      summary: List all tag definitions
+      description: Returns all tag definitions. Admins see all; moderators see active only.
+      operationId: listTagDefinitions
+      tags: [Tag Management]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [user, chat]
+          description: Filter by tag category
+        - name: active
+          in: query
+          schema:
+            type: boolean
+          description: Filter by active status (default true for non-admins)
+      responses:
+        '200':
+          description: List of tag definitions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TagDefinition'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Create a new tag definition
+      description: |
+        Creates a new tag definition. Requires TAG_MANAGE permission (admin only).
+        Name must be unique (case-insensitive) across all categories.
+      operationId: createTagDefinition
+      tags: [Tag Management]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagDefinitionInput'
+      responses:
+        '201':
+          description: Tag definition created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDefinition'
+        '400':
+          description: Validation error (empty name, name too long)
+        '409':
+          description: Tag name already exists (case-insensitive)
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/tags/{tagId}:
+    parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get tag definition details
+      operationId: getTagDefinition
+      tags: [Tag Management]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tag definition details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDefinition'
+        '404':
+          description: Tag not found
+
+    put:
+      summary: Update a tag definition
+      description: |
+        Updates name, description, excludeFromReviews, or isActive status.
+        Requires TAG_MANAGE permission. Name uniqueness enforced on rename.
+      operationId: updateTagDefinition
+      tags: [Tag Management]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTagDefinitionInput'
+      responses:
+        '200':
+          description: Tag definition updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDefinition'
+        '409':
+          description: New name conflicts with existing tag
+
+    delete:
+      summary: Delete a tag definition
+      description: |
+        Deletes a tag definition and cascades to all user_tags and session_tags
+        assignments. session_exclusions retain the reason text but lose the
+        tag_definition_id reference. Requires TAG_MANAGE permission.
+      operationId: deleteTagDefinition
+      tags: [Tag Management]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tag deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  affectedUsers:
+                    type: integer
+                  affectedSessions:
+                    type: integer
+        '404':
+          description: Tag not found
+
+  # ── User Tag Assignment (Admin/Moderator) ───────────────────────────────────
+
+  /admin/users/{userId}/tags:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: List tags assigned to a user
+      operationId: listUserTags
+      tags: [User Tags]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserTag'
+
+    post:
+      summary: Assign a tag to a user
+      description: |
+        Assigns an existing user-category tag to a user account.
+        Requires TAG_ASSIGN_USER permission (moderator or admin).
+      operationId: assignUserTag
+      tags: [User Tags]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tagDefinitionId]
+              properties:
+                tagDefinitionId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Tag assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTag'
+        '400':
+          description: Tag is not a user-category tag
+        '409':
+          description: Tag already assigned to this user
+
+  /admin/users/{userId}/tags/{tagId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The tag_definition_id to remove
+
+    delete:
+      summary: Remove a tag from a user
+      description: |
+        Removes a tag assignment from a user. Does not affect existing
+        sessions already in the review queue (FR-013).
+        Requires TAG_ASSIGN_USER permission.
+      operationId: removeUserTag
+      tags: [User Tags]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tag removed
+        '404':
+          description: Tag assignment not found
+
+  # ── Session Tag Management (Moderator) ──────────────────────────────────────
+
+  /review/sessions/{sessionId}/tags:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: List tags on a session
+      operationId: listSessionTags
+      tags: [Session Tags]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Session's tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SessionTag'
+
+    post:
+      summary: Add a tag to a session
+      description: |
+        Adds an existing chat-category tag to a session, or creates a new
+        ad-hoc tag definition (with excludeFromReviews=false) if the provided
+        tag name doesn't match any existing definition.
+        Requires TAG_ASSIGN_SESSION permission (moderator or admin).
+      operationId: addSessionTag
+      tags: [Session Tags]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [tagDefinitionId]
+                  properties:
+                    tagDefinitionId:
+                      type: string
+                      format: uuid
+                      description: Existing tag definition ID
+                - type: object
+                  required: [tagName]
+                  properties:
+                    tagName:
+                      type: string
+                      maxLength: 100
+                      description: |
+                        Tag name. If no matching tag definition exists,
+                        a new chat-category tag definition is auto-created.
+      responses:
+        '201':
+          description: Tag applied (and possibly created)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionTag:
+                    $ref: '#/components/schemas/SessionTag'
+                  tagDefinitionCreated:
+                    type: boolean
+                    description: Whether a new tag definition was auto-created
+        '400':
+          description: Tag is not a chat-category tag
+        '409':
+          description: Tag already applied to this session
+
+  /review/sessions/{sessionId}/tags/{tagId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The tag_definition_id to remove
+
+    delete:
+      summary: Remove a tag from a session
+      description: |
+        Removes a manually applied tag from a session.
+        System-applied tags (e.g., "short") cannot be removed via this endpoint.
+        Requires TAG_ASSIGN_SESSION permission.
+      operationId: removeSessionTag
+      tags: [Session Tags]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tag removed
+        '400':
+          description: Cannot remove system-applied tags
+        '404':
+          description: Tag assignment not found
+
+  # ── Tag Listing for Filters ────────────────────────────────────────────────
+
+  /review/tags:
+    get:
+      summary: List tags available for filtering
+      description: |
+        Returns all active tag definitions that have at least one session
+        assignment. Used to populate the tag filter dropdown in the review queue.
+      operationId: listFilterTags
+      tags: [Review Queue]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tags with session counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        category:
+                          type: string
+                          enum: [user, chat]
+                        sessionCount:
+                          type: integer
+                          description: Number of sessions with this tag
+
+  # ── Review Queue Extensions ────────────────────────────────────────────────
+
+  /review:
+    get:
+      summary: Review queue (extended with tag filtering)
+      description: |
+        Existing review queue endpoint extended with tag filtering and
+        excluded sessions view. By default, excluded sessions are hidden.
+        Pass excluded=true to see only excluded sessions.
+        Pass tags=tag1,tag2 to filter by specific tags (overrides exclusion hiding).
+      operationId: getReviewQueue
+      tags: [Review Queue]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending_review, in_progress, completed, disputed]
+        - name: riskLevel
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low, none]
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: tags
+          in: query
+          schema:
+            type: string
+          description: Comma-separated tag names to filter by
+        - name: excluded
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: If true, show only excluded sessions with exclusion reasons
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Queue sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QueueSession'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  # ── Admin Config Extension ─────────────────────────────────────────────────
+
+  /admin/review/config:
+    put:
+      summary: Update review configuration (extended)
+      description: |
+        Existing config endpoint extended with minMessageThreshold field.
+      operationId: updateReviewConfig
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                minMessageThreshold:
+                  type: integer
+                  minimum: 1
+                  description: Minimum user+AI messages for review inclusion
+      responses:
+        '200':
+          description: Configuration updated
+
+  # ── User List Extension ─────────────────────────────────────────────────────
+
+  /admin/users:
+    get:
+      summary: User list (extended with tag filter)
+      description: |
+        Existing user list endpoint extended with tag filtering (FR-015).
+      operationId: listUsers
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: string
+          description: Comma-separated tag names to filter users by
+      responses:
+        '200':
+          description: Filtered user list
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TagDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        nameLower:
+          type: string
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+          enum: [user, chat]
+        excludeFromReviews:
+          type: boolean
+        isActive:
+          type: boolean
+        createdBy:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateTagDefinitionInput:
+      type: object
+      required: [name, category]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        category:
+          type: string
+          enum: [user, chat]
+        excludeFromReviews:
+          type: boolean
+          default: false
+
+    UpdateTagDefinitionInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        excludeFromReviews:
+          type: boolean
+        isActive:
+          type: boolean
+
+    UserTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        tagDefinitionId:
+          type: string
+          format: uuid
+        assignedBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        tagDefinition:
+          $ref: '#/components/schemas/TagDefinition'
+
+    SessionTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        tagDefinitionId:
+          type: string
+          format: uuid
+        source:
+          type: string
+          enum: [system, manual]
+        appliedBy:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        tagDefinition:
+          $ref: '#/components/schemas/TagDefinition'
+
+    SessionExclusion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        reason:
+          type: string
+        reasonSource:
+          type: string
+          enum: [user_tag, chat_tag]
+        tagDefinitionId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    QueueSession:
+      type: object
+      description: Session in the review queue, extended with tag and exclusion info
+      properties:
+        id:
+          type: string
+          format: uuid
+        anonymousUserId:
+          type: string
+          description: USER-XXXX format
+        messageCount:
+          type: integer
+        reviewStatus:
+          type: string
+        reviewCount:
+          type: integer
+        riskLevel:
+          type: string
+        language:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionTag'
+          description: Tags applied to this session
+        exclusions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionExclusion'
+          description: Exclusion reasons (only populated when excluded=true)
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+    Forbidden:
+      description: Insufficient permissions

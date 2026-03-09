@@ -1,0 +1,34 @@
+{
+  "name": "prod",
+  "protection_rules": {
+    "wait_timer": 0,
+    "reviewers": []
+  },
+  "secrets": {
+    "GCP_WIF_PROVIDER": "sm:gcp-wif-provider",
+    "DATABASE_URL": "sm:db-password:database_url",
+    "JWT_SECRET": "sm:jwt-secret",
+    "JWT_REFRESH_SECRET": "sm:jwt-refresh-secret",
+    "GMAIL_CLIENT_SECRET": "sm:gmail-client-secret",
+    "GMAIL_REFRESH_TOKEN": "sm:gmail-refresh-token"
+  },
+  "variables": {
+    "GCP_PROJECT_ID": "your-gcp-project-id",
+    "GCP_SERVICE_ACCOUNT": "github-actions-sa@your-gcp-project-id.iam.gserviceaccount.com",
+    "BACKEND_URL": "UPDATE_AFTER_FIRST_DEPLOY",
+    "FRONTEND_URL": "https://mentalhelp.chat",
+    "GCS_BUCKET": "your-gcp-project-id-frontend",
+    "GCS_BUCKET_NAME": "your-gcp-project-id-chat-conversations",
+    "CLOUD_SQL_CONNECTION": "your-gcp-project-id:europe-west1:chat-db",
+    "VERTEX_MODEL": "publishers/google/models/gemini-2.5-flash-lite",
+    "VERTEX_LOCATION": "us-central1",
+    "VERTEX_PROJECT_ID": "your-gcp-project-id",
+    "DIALOGFLOW_PROJECT_ID": "your-gcp-project-id",
+    "DIALOGFLOW_AGENT_ID": "UPDATE_WITH_AGENT_ID",
+    "DIALOGFLOW_LOCATION": "global",
+    "LLM_PROVIDER": "vertex",
+    "EMAIL_PROVIDER": "gmail",
+    "EMAIL_FROM": "UPDATE_WITH_SENDER_ADDRESS",
+    "GMAIL_CLIENT_ID": "UPDATE_WITH_OAUTH_CLIENT_ID"
+  }
+}

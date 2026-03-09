@@ -1,0 +1,27 @@
+// Re-export all conversation types from shared package
+export type {
+  SystemPromptMessage,
+  StoredSystemPrompts,
+  ToolUseAction,
+  AgentUtteranceAction,
+  DialogflowAction,
+  GenerativeInfo,
+  WebhookStatus,
+  AlternativeIntent,
+  ExecutionStepInterval,
+  ExecutionStepStatus,
+  ExecutionStepResponse,
+  ExecutionStep,
+  ExecutionResult,
+  AdditionalInfo,
+  DataStoreExecutionSequence,
+  DiagnosticInfo,
+  SentimentAnalysis,
+  FlowInfo,
+  IntentInfo,
+  MatchInfo,
+  StoredMessageFeedback,
+  StoredMessage,
+  StoredConversation,
+  ConversationMetadata
+} from '@mentalhelpglobal/chat-types';

@@ -1,0 +1,35 @@
+name: Enforce main only from develop
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close PRs to main unless head is develop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "base_ref=${{ github.event.pull_request.base.ref }}"
+          echo "head_ref=${{ github.event.pull_request.head.ref }}"
+          echo "pr_number=${{ github.event.pull_request.number }}"
+
+          if [ "${{ github.event.pull_request.head.ref }}" = "develop" ]; then
+            echo "OK: PR targets main from develop."
+            exit 0
+          fi
+
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --body "This repository enforces **main updates only via PRs from `develop`**. Please retarget your changes to `develop` and promote via `develop → main`."
+
+          gh pr close "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --comment "Closed automatically: main must be updated only from develop."
+

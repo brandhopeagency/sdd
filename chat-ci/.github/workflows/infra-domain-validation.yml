@@ -1,0 +1,45 @@
+name: Infra Domain Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  domain-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate production HTTPS endpoint
+        run: |
+          set -e
+          curl -I --fail --max-time 20 https://mentalhelp.chat
+
+      - name: Validate www to apex redirect
+        run: |
+          set -e
+          redirect_target=$(curl -I -s https://www.mentalhelp.chat | awk -F': ' '/^location:/I {print $2}' | tr -d '\r')
+          echo "Redirect location: ${redirect_target}"
+          echo "${redirect_target}" | grep -E '^https://mentalhelp\.chat/?$'
+
+      - name: Validate dev UI endpoint
+        run: |
+          set -e
+          curl -I --fail --max-time 20 https://dev.mentalhelp.chat
+
+      - name: Fail if managed certificates are not ACTIVE
+        env:
+          CERT_STATUS_JSON: ${{ secrets.MENTALHELP_CERT_STATUS_JSON }}
+        run: |
+          set -e
+          if [ -z "${CERT_STATUS_JSON}" ]; then
+            echo "MENTALHELP_CERT_STATUS_JSON secret is required"
+            exit 1
+          fi
+          echo "${CERT_STATUS_JSON}" | jq -e '.[] | select(.managed.status != "ACTIVE")' >/dev/null && {
+            echo "Found non-active managed certificate"
+            exit 1
+          } || true

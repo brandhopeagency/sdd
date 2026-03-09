@@ -1,0 +1,19 @@
+---
+description: Required flow for promoting develop to main and deploying production
+alwaysApply: true
+---
+
+# Develop To Main Production Flow
+
+Use this flow whenever production release is requested:
+
+1. Create a short-lived `release/*` branch from `develop`.
+2. Execute full release validation (unit/integration/UI and migration safety checks).
+3. Open a PR from `release/*` to `main` with release scope, risk notes, rollback plan, and test evidence.
+4. Merge to `main` only after required approvals and required checks are green.
+5. Tag the merged `main` commit with an immutable release tag.
+6. Deploy production from that exact tagged `main` commit.
+7. Run post-deploy smoke/critical-flow checks and monitor errors.
+8. If rollback is required, redeploy the previous known-good release tag.
+
+Do not deploy to production from `develop` or from an unreviewed/untracked commit.

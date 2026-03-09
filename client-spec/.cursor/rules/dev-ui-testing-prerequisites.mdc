@@ -1,0 +1,15 @@
+---
+description: Prerequisites for dev UI Playwright validation
+alwaysApply: true
+---
+
+# Dev UI Testing Prerequisites
+
+Before running dev UI validation (manual or Playwright), confirm all of the following:
+
+- Use the current dev frontend URL from the latest deploy workflow, not a cached/old URL.
+- Use an approved account with workbench/review permissions (for OTP flows, read the OTP from console in dev).
+- Verify backend and frontend are from the same deploy cycle before investigating UI/API mismatches.
+- Confirm the selected space/group context is valid for the account being tested.
+- For review testing, open at least one session with reviewable assistant messages before assessing rating flow.
+- Always check browser console and network for non-2xx API calls; include endpoint + status in findings.

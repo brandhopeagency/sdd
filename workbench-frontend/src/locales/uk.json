@@ -1,0 +1,1175 @@
+{
+  "app": {
+    "name": "Підтримка психічного здоров'я",
+    "tagline": "Безпечний простір для розмови",
+    "description": "Зв'яжіться з нашим AI-асистентом для співчутливої підтримки без осуду, коли вам це потрібно."
+  },
+  "welcome": {
+    "startConversation": "Почати розмову",
+    "signInToStart": "Увійти, щоб почати",
+    "alreadyHaveAccount": "Вже маєте акаунт?",
+    "signIn": "Увійти",
+    "signedInAs": "Ви увійшли як {{name}}",
+    "privacyNote": "Ваші розмови приватні та конфіденційні.",
+    "features": {
+      "private": "Приватно та безпечно",
+      "compassionate": "Співчутливо",
+      "available": "Доступно 24/7"
+    },
+    "footer": {
+      "privacy": "Політика конфіденційності",
+      "terms": "Умови використання",
+      "crisis": "Кризові ресурси"
+    }
+  },
+  "pending": {
+    "title": "Потрібне підтвердження",
+    "subtitle": "Ваш акаунт очікує підтвердження адміністратором.",
+    "signedInAs": "Ви увійшли як {{email}}",
+    "backToHome": "На головну"
+  },
+  "login": {
+    "title": "Ласкаво просимо",
+    "subtitle": "Увійдіть, щоб продовжити",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "signInButton": "Увійти",
+    "signingIn": "Входимо...",
+    "invalidCredentials": "Невірна електронна пошта або пароль.",
+    "back": "Назад",
+    "otp": {
+      "emailLabel": "Електронна пошта",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "Ми надішлемо вам одноразовий код для входу",
+      "invitationLabel": "Код запрошення (необов'язково)",
+      "invitationPlaceholder": "Введіть код запрошення",
+      "invitationHint": "Використайте код, щоб подати заявку до групи",
+      "sendCode": "Надіслати код",
+      "sending": "Надсилаємо...",
+      "codeLabel": "Код підтвердження",
+      "codeHint": "Введіть 6-значний код з вашої пошти",
+      "verify": "Підтвердити",
+      "verifying": "Перевіряємо...",
+      "changeEmail": "Змінити email",
+      "codeSent": "Код надіслано на",
+      "invalidEmail": "Введіть коректну email адресу",
+      "invalidCode": "Введіть 6-значний код",
+      "invalid_otp": "Невірний код. Спробуйте ще раз.",
+      "otp_expired": "Код застарів. Запросіть новий.",
+      "account_pending_approval": "Ваш акаунт очікує на затвердження.",
+      "account_disapproved": "Ваш акаунт було відхилено.",
+      "disapproved_cooling_off": "Акаунт відхилено. Повторна заявка можлива після періоду очікування.",
+      "invalid_invitation_code": "Код запрошення має бути буквено-цифровим.",
+      "invitation_code_not_found": "Код запрошення не знайдено.",
+      "guest_disabled": "Гостьовий режим вимкнено.",
+      "otp_disabled_workbench": "Вхід за допомогою email недоступний для цього додатку.",
+      "google_login_failed": "Помилка входу через Google. Спробуйте ще раз."
+    },
+    "google": {
+      "error": "Помилка входу через Google. Спробуйте ще раз.",
+      "noCredential": "Облікові дані від Google не отримано."
+    },
+    "divider": "або",
+    "noMethodsAvailable": "Наразі немає доступних методів входу."
+  },
+  "chat": {
+    "header": {
+      "title": "Асистент психічного здоров'я",
+      "subtitle": "Тут, щоб підтримати вас"
+    },
+    "input": {
+      "placeholder": "Напишіть ваше повідомлення...",
+      "send": "Надіслати",
+      "debugTip": "Порада: Введіть /debug:enable для режиму налагодження"
+    },
+    "session": {
+      "end": "Завершити чат",
+      "new": "Нова сесія",
+      "starting": "Запускаємо сесію..."
+    },
+    "memory": {
+      "updating": "Оновлюємо памʼять у фоні…"
+    },
+    "memoryCollapsedHint": "{{count}} блоків",
+    "messages": {
+      "assistant": "Асистент",
+      "you": "Ви",
+      "helpful": "Корисно",
+      "notHelpful": "Не корисно",
+      "giveFeedback": "Залишити детальний відгук",
+      "feedbackSubmitted": "Відгук надіслано",
+      "thanks": "Дякуємо!"
+    },
+    "debug": {
+      "title": "Режим налагодження",
+      "info": "Інформація налагодження",
+      "intent": "Намір",
+      "confidence": "Впевненість",
+      "responseTime": "Час відповіді",
+      "parameters": "Параметри",
+      "systemPrompts": "Системні промпти",
+      "summarizationPrompt": "Промпт підсумовування/пошуку",
+      "searchResultsUsedInMainPrompt": "Результати, використані в основному промпті",
+      "userMemory": "Памʼять користувача",
+      "loading": "Завантаження…",
+      "loadFailed": "Не вдалося завантажити",
+      "memoryEmpty": "Памʼять порожня або ще не сформована для цього користувача"
+    },
+    "guest": "Гість",
+    "register": "Зареєструватись",
+    "registerPopup": {
+      "title": "Реєстрація",
+      "subtitle": "Збережіть ваш чат",
+      "chatPreserved": "Ваша поточна розмова буде збережена за вашим акаунтом"
+    }
+  },
+  "feedback": {
+    "title": "Залишити відгук",
+    "question": "Наскільки корисною була ця відповідь?",
+    "selectRating": "Оберіть оцінку",
+    "ratings": {
+      "poor": "Погано",
+      "fair": "Задовільно",
+      "good": "Добре",
+      "great": "Чудово",
+      "excellent": "Відмінно"
+    },
+    "comment": "Додаткові коментарі (необов'язково)",
+    "commentPlaceholder": "Розкажіть більше про ваш досвід...",
+    "cancel": "Скасувати",
+    "submit": "Надіслати відгук"
+  },
+  "workbench": {
+    "title": "Робочий простір",
+    "subtitle": "Панель адміністратора",
+    "scopeSelector": {
+      "label": "Простір",
+      "ariaLabel": "Вибір простору",
+      "global": "Глобальний",
+      "placeholder": "Оберіть простір"
+    },
+    "groupSelector": {
+      "label": "Група",
+      "ariaLabel": "Вибір групи"
+    },
+    "nav": {
+      "dashboard": "Панель керування",
+      "groupDashboard": "Дашборд групи",
+      "groupUsers": "Користувачі групи",
+      "groupChats": "Чати групи",
+      "groupSection": "Ресурси групи",
+      "users": "Управління користувачами",
+      "groups": "Управління групами",
+      "approvals": "Схвалення",
+      "research": "Дослідження та модерація",
+      "privacy": "Контроль конфіденційності",
+      "reviewReports": "Звіти та аналітика",
+      "tagManagement": "Управління тегами",
+      "surveySchemas": "Схеми опитувань",
+      "surveyInstances": "Екземпляри опитувань",
+      "settings": "Налаштування",
+      "backToChat": "Повернутися до чату"
+    },
+    "groupSelector": {
+      "label": "Активна група"
+    },
+    "pii": {
+      "masked": "Приховано",
+      "visible": "Видимо",
+      "label": "PII",
+      "safeForSharing": "Безпечно для демонстрації екрану"
+    }
+  },
+  "dashboard": {
+    "title": "Панель керування",
+    "welcome": "Ласкаво просимо",
+    "stats": {
+      "activeUsers": "Активні користувачі",
+      "pendingApprovals": "Очікують схвалення",
+      "blockedUsers": "Заблоковані користувачі",
+      "pendingReview": "Очікують перевірки",
+      "activeSessions": "Активні сесії",
+      "thisWeek": "+12% цього тижня",
+      "requiresAttention": "Потребує уваги",
+      "awaitingApproval": "Очікують перевірки",
+      "awaitingModeration": "Сесії очікують модерації",
+      "inProgress": "В процесі"
+    },
+    "recentSessions": "Останні сесії",
+    "recentUsers": "Останні користувачі",
+    "messages": "повідомлень",
+    "moderationProgress": "Прогрес модерації",
+    "reviewed": "перевірено"
+  },
+  "group": {
+    "dashboard": {
+      "title": "Дашборд групи",
+      "welcome": "Ласкаво просимо",
+      "groupLabel": "Група",
+      "unknownGroup": "Невідомо",
+      "noGroup": "Виберіть групу для перегляду панелі",
+      "stats": {
+        "groupUsers": "Користувачі групи",
+        "activeUsers": "Активні",
+        "blockedUsers": "Заблоковані",
+        "sessionsTotal": "Сесії",
+        "activeSessions": "Активні сесії",
+        "pendingReview": "Очікують перевірки"
+      },
+      "quickActions": {
+        "title": "Швидкі дії",
+        "subtitle": "Часті задачі адміністратора групи",
+        "manageUsers": "Керувати користувачами групи",
+        "viewChats": "Переглянути анонімізовані чати"
+      },
+      "security": {
+        "title": "Межі доступу",
+        "notice": "Ви можете переглядати та керувати користувачами і чатами лише в межах вашої групи. Чати завжди показуються в анонімізованому вигляді."
+      }
+    },
+    "users": {
+      "title": "Користувачі групи",
+      "subtitle": "Перегляд і керування користувачами у вашій групі",
+      "invites": {
+        "title": "Коди запрошення",
+        "subtitle": "Згенеруйте код, щоб користувачі могли запросити доступ до цієї групи",
+        "generate": "Згенерувати код",
+        "copy": "Копіювати",
+        "copied": "Скопійовано"
+      },
+      "requests": {
+        "title": "Запити на вступ",
+        "subtitle": "Підтвердіть або відхиліть користувачів, які запитують доступ до групи",
+        "empty": "Немає запитів, що очікують",
+        "approve": "Підтвердити",
+        "reject": "Відхилити"
+      },
+      "noGroup": "Виберіть групу для перегляду користувачів",
+      "search": "Пошук за ім'ям або email...",
+      "addByEmail": "Додати користувача за email",
+      "add": "Додати в групу",
+      "remove": "Видалити",
+      "readOnly": "Лише перегляд"
+    },
+    "sessions": {
+      "title": "Чати групи",
+      "subtitle": "Анонімізовані чати в межах вашої групи",
+      "noGroup": "Виберіть групу для перегляду сесій",
+      "search": "Пошук за ID сесії...",
+      "emptyConversation": "У цій сесії ще немає повідомлень",
+      "back": "Назад до сесій"
+    }
+  },
+  "groups": {
+    "title": "Групи",
+    "subtitle": "Створення та керування групами користувачів",
+    "refresh": "Оновити",
+    "list": "Усі групи",
+    "create": "Створити групу",
+    "createPlaceholder": "Назва групи",
+    "details": "Деталі групи",
+    "rename": "Перейменувати",
+    "members": "Учасники",
+    "addMember": "Додати",
+    "addMemberPlaceholder": "user@example.com",
+    "memberRole": "Учасник",
+    "adminRole": "Адміністратор",
+    "removeMember": "Видалити учасника",
+    "noMembers": "Учасників не знайдено",
+    "invites": "Коди запрошення",
+    "inviteCodePlaceholder": "INVITE123",
+    "createInvite": "Створити код",
+    "inviteExpires": "Закінчується {{date}}",
+    "inviteNoExpiry": "Без строку",
+    "inviteInactive": "Неактивний",
+    "deactivateInvite": "Деактивувати",
+    "noInvites": "Кодів запрошення немає",
+    "noGroupSelected": "Виберіть групу для керування",
+    "requiresApproval": "Потребує схвалення",
+    "autoAdmit": "Автодопуск",
+    "requiresApprovalToggle": "Вимагати схвалення для вступу"
+  },
+  "approvals": {
+    "title": "Схвалення",
+    "subtitle": "Схвалення або відхилення запитів доступу",
+    "refresh": "Оновити",
+    "empty": "Немає запитів на схвалення",
+    "noGroup": "Виберіть групу для перегляду схвалень",
+    "emptyHint": "Запити з'являються, коли користувачі запитують доступ.",
+    "emptyCta": "Відкрити управління користувачами",
+    "commentLabel": "Коментар (обов'язково для відхилення)",
+    "commentPlaceholder": "Додайте примітку",
+    "commentRequired": "Для відхилення потрібен коментар",
+    "approve": "Схвалити",
+    "disapprove": "Відхилити"
+  },
+  "users": {
+    "title": "Управління користувачами",
+    "subtitle": "Керуйте обліковими записами та правами доступу",
+    "search": "Пошук за ім'ям або email...",
+    "filters": {
+      "allRoles": "Всі ролі",
+      "allStatus": "Всі статуси",
+      "active": "Активні",
+      "blocked": "Заблоковані",
+      "pending": "Очікують",
+      "approval": "Очікує на схвалення",
+      "disapproved": "Відхилені",
+      "anonymized": "Анонімізовані",
+      "testUsersOnly": "Лише тестові користувачі"
+    },
+    "table": {
+      "name": "Ім'я",
+      "email": "Email",
+      "role": "Роль",
+      "status": "Статус",
+      "lastActive": "Остання активність",
+      "actions": "Дії",
+      "view": "Переглянути",
+      "never": "Ніколи",
+      "testUserBadge": "Тестовий користувач"
+    },
+    "pagination": {
+      "showing": "Показано",
+      "of": "з",
+      "users": "користувачів",
+      "page": "Сторінка"
+    },
+    "empty": "Користувачів не знайдено",
+    "sort": {
+      "ariaLabel": "Сортування користувачів",
+      "newest": "Спочатку нові",
+      "oldest": "Спочатку старі",
+      "nameAsc": "Ім'я (А→Я)",
+      "emailAsc": "Email (A→Z)",
+      "lastActive": "Остання активність (нові)",
+      "mostSessions": "Найбільше сесій"
+    },
+    "pageSize": {
+      "ariaLabel": "Користувачів на сторінці"
+    },
+    "createUser": {
+      "title": "Створити користувача",
+      "subtitle": "Додати нового користувача до системи",
+      "button": "Додати користувача",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "displayName": "Ім'я",
+      "displayNamePlaceholder": "Ім'я користувача",
+      "role": "Роль",
+      "status": "Статус",
+      "submit": "Створити",
+      "cancel": "Скасувати",
+      "success": "Користувача успішно створено",
+      "error": {
+        "emailRequired": "Email обов'язковий",
+        "displayNameRequired": "Ім'я обов'язкове",
+        "invalidEmail": "Невірний формат email",
+        "emailExists": "Користувач з таким email вже існує",
+        "generic": "Помилка при створенні користувача"
+      }
+    }
+  },
+  "userProfile": {
+    "backToList": "Повернутися до списку",
+    "accountInfo": "Інформація про акаунт",
+    "created": "Створено",
+    "lastLogin": "Останній вхід",
+    "totalSessions": "Всього сесій",
+    "userId": "ID користувача",
+    "adminActions": "Адміністративні дії",
+    "blockUser": "Заблокувати користувача",
+    "unblockUser": "Розблокувати користувача",
+    "changeRole": "Змінити роль",
+    "gdpr": {
+      "title": "Права на дані GDPR",
+      "description": "Ці дії підтримують відповідність GDPR для переносу та видалення даних.",
+      "downloadArchive": "Завантажити архів",
+      "executeErasure": "Виконати видалення",
+      "exportRequested": "Експорт запитано. ID завдання:",
+      "exportReady": "Ви отримаєте email, коли експорт буде готовий для завантаження."
+    },
+    "erasure": {
+      "confirmTitle": "Підтвердження видалення даних",
+      "cannotUndo": "Цю дію неможливо скасувати",
+      "warning": "Це назавжди анонімізує всі персональні дані для",
+      "reason": "Причина видалення (обов'язково)",
+      "reasonPlaceholder": "Введіть причину цього запиту на видалення даних...",
+      "cancel": "Скасувати",
+      "execute": "Виконати видалення"
+    },
+    "anonymized": {
+      "title": "Анонімізований акаунт",
+      "description": "Дані цього користувача були анонімізовані за запитом GDPR. Персональну інформацію видалено і неможливо відновити."
+    }
+  },
+  "research": {
+    "title": "Дослідження та модерація",
+    "subtitle": "Переглядайте та анотуйте сесії чату",
+    "search": "Пошук за ID сесії або користувачем...",
+    "filters": {
+      "allStatus": "Всі статуси",
+      "pending": "Очікує",
+      "inReview": "На перевірці",
+      "moderated": "Модеровано"
+    },
+    "session": {
+      "user": "Користувач",
+      "anonymous": "Анонімний",
+      "messages": "повідомлень",
+      "total": "всього сесій",
+      "pendingReview": "очікують перевірки"
+    }
+  },
+  "moderation": {
+    "backToSessions": "Назад",
+    "columns": {
+      "transcript": "Транскрипт",
+      "goldenReference": "Еталонна відповідь",
+      "annotation": "Анотація"
+    },
+    "transcript": {
+      "messages": "повідомлень"
+    },
+    "golden": {
+      "title": "Еталонні відповіді",
+      "subtitle": "Ідеальні відповіді для навчання",
+      "placeholder": "Введіть ідеальну відповідь для цього повідомлення...",
+      "rlhfNote": "Це буде використано як навчальні дані для RLHF.",
+      "selectMessage": "Виберіть повідомлення з транскрипту, щоб додати еталонну відповідь",
+      "previous": "Попередні анотації",
+      "rating": "Рейтинг"
+    },
+    "annotation": {
+      "title": "Анотація",
+      "subtitle": "Оцініть та позначте цю сесію",
+      "qualityRating": "Оцінка якості",
+      "ratings": {
+        "poor": "Погано",
+        "fair": "Задовільно",
+        "good": "Добре",
+        "veryGood": "Дуже добре",
+        "excellent": "Відмінно"
+      },
+      "notes": "Нотатки",
+      "notesPlaceholder": "Додайте ваші спостереження та нотатки...",
+      "messageTags": "Теги повідомлення",
+      "save": "Зберегти анотацію",
+      "markComplete": "Позначити як завершено"
+    },
+    "tags": {
+      "addTag": "Додати тег",
+      "sessionTags": "Теги сесії",
+      "customTag": "Власний тег..."
+    }
+  },
+  "privacy": {
+    "title": "Контроль конфіденційності",
+    "subtitle": "Відповідність GDPR та управління захистом даних",
+    "piiProtection": {
+      "title": "Захист PII",
+      "masked": "Персональні дані приховані для безпечного перегляду",
+      "visible": "Персональні дані наразі видимі"
+    },
+    "dataRequests": {
+      "title": "Запити на дані",
+      "subtitle": "Активні запити на експорт та доступ",
+      "pending": "Очікують"
+    },
+    "anonymizedRecords": {
+      "title": "Анонімізовані записи",
+      "subtitle": "користувачів анонімізовано"
+    },
+    "quickActions": {
+      "title": "Швидкі дії",
+      "bulkExport": "Масовий експорт",
+      "bulkExportDesc": "Експортувати всі дані користувачів для аудиту",
+      "generateReport": "Згенерувати звіт",
+      "generateReportDesc": "Створити звіт відповідності GDPR",
+      "dataRetention": "Зберігання даних",
+      "dataRetentionDesc": "Переглянути політики зберігання"
+    },
+    "auditLog": {
+      "title": "Журнал аудиту",
+      "search": "Пошук у журналах...",
+      "columns": {
+        "action": "Дія",
+        "targetUser": "Цільовий користувач",
+        "performedBy": "Виконав",
+        "date": "Дата",
+        "status": "Статус"
+      },
+      "actions": {
+        "dataExport": "Експорт даних",
+        "dataErasure": "Видалення даних",
+        "piiAccess": "Доступ до PII"
+      },
+      "status": {
+        "completed": "Завершено",
+        "pending": "Очікує"
+      }
+    },
+    "gdprCompliance": {
+      "title": "Статус відповідності GDPR",
+      "description": "Ця система підтримує Статтю 15 (Право на доступ), Статтю 17 (Право на видалення) та Статтю 20 (Право на переносимість даних). Всі дії з обробки даних записуються для аудиту."
+    }
+  },
+  "review": {
+    "common": {
+      "back": "Назад",
+      "cancel": "Скасувати",
+      "close": "Закрити",
+      "confirm": "Підтвердити",
+      "error": "Помилка",
+      "loading": "Завантаження...",
+      "noData": "Дані відсутні",
+      "save": "Зберегти",
+      "saving": "Збереження...",
+      "retry": "Повторити"
+    },
+    "config": {
+      "title": "Налаштування рецензування",
+      "lastUpdated": "Оновлено {{user}} {{date}}",
+      "minReviews": "Мінімум рецензій",
+      "minReviewsDesc": "Мінімальна кількість рецензій на сесію",
+      "maxReviews": "Максимум рецензій",
+      "maxReviewsDesc": "Максимальна кількість рецензій на сесію",
+      "criteriaThreshold": "Поріг критеріїв",
+      "criteriaThresholdDesc": "Оцінка, при якій або нижче потрібен відгук за критеріями",
+      "autoFlagThreshold": "Поріг автопозначення",
+      "autoFlagThresholdDesc": "Оцінка, при якій або нижче сесії автоматично позначаються",
+      "varianceLimit": "Ліміт відхилення",
+      "varianceLimitDesc": "Максимально допустиме відхилення оцінок між рецензентами",
+      "timeoutHours": "Тайм-аут (години)",
+      "timeoutHoursDesc": "Години до закінчення терміну рецензування",
+      "highRiskSlaHours": "SLA високого ризику (години)",
+      "highRiskSlaHoursDesc": "Дедлайн SLA для прапорців високого ризику",
+      "mediumRiskSlaHours": "SLA середнього ризику (години)",
+      "mediumRiskSlaHoursDesc": "Дедлайн SLA для прапорців середнього ризику",
+      "deanonymizationAccessHours": "Доступ деанонімізації (години)",
+      "deanonymizationAccessHoursDesc": "Години доступу після схвалення деанонімізації",
+      "minMessageThreshold": "Мін. кількість повідомлень",
+      "minMessageThresholdDesc": "Сесії з меншою кількістю повідомлень позначаються як короткі",
+      "save": "Зберегти налаштування",
+      "saved": "Налаштування збережено",
+      "unknownUser": "Невідомий користувач",
+      "validation": {
+        "range": "Значення має бути між {{min}} та {{max}}",
+        "maxReviewsGteMin": "Максимум рецензій має бути не менше мінімуму",
+        "varianceRange": "Відхилення має бути між 0 та максимальною оцінкою"
+      }
+    },
+    "criteriaFeedback": {
+      "title": "Відгук за критеріями",
+      "required": "Обов'язково",
+      "checkboxHint": "Оберіть критерії, що застосовуються для оцінок ≤ {{threshold}}. Деталі необов'язкові.",
+      "optionalDetail": "Додайте необов'язковий коментар...",
+      "selectAtLeastOne": "Оберіть хоча б один критерій."
+    },
+    "criteria": {
+      "relevance": { "name": "Релевантність", "description": "Наскільки відповідь стосується проблеми користувача" },
+      "empathy": { "name": "Емпатія", "description": "Рівень співчуття та емоційної уважності" },
+      "safety": { "name": "Безпека", "description": "Чи забезпечує відповідь безпеку користувача" },
+      "ethics": { "name": "Етика", "description": "Дотримання етичних норм та меж" },
+      "clarity": { "name": "Зрозумілість", "description": "Наскільки чітко та зрозуміло сформульовано відповідь" }
+    },
+    "escalation": {
+      "title": "Ескалації",
+      "empty": "Немає відкритих ескалацій",
+      "overdueSla": "{{count}} прострочених SLA",
+      "acknowledge": "Підтвердити",
+      "resolve": "Вирішити",
+      "escalate": "Ескалювати",
+      "requestDeanonymization": "Запит деанонімізації",
+      "submitDeanonymization": "Надіслати запит",
+      "resolutionNotes": "Нотатки про вирішення..."
+    },
+    "flag": {
+      "title": "Прапорець ризику",
+      "severity": "Серйозність",
+      "severityRequired": "Серйозність обов'язкова",
+      "reason": "Категорія причини",
+      "reasonRequired": "Категорія причини обов'язкова",
+      "details": "Деталі",
+      "detailsMin": "Мінімум 10 символів",
+      "requestDeanonymization": "Запит деанонімізації",
+      "deanonymizationJustification": "Обґрунтування деанонімізації...",
+      "submit": "Надіслати прапорець",
+      "autoDetected": "Автовиявлено",
+      "notificationDelivered": "Прапорець створено — повідомлення доставлено",
+      "notificationPending": "Прапорець створено — доставка повідомлення очікується",
+      "notificationFailed": "Прапорець створено — доставка повідомлення не вдалася",
+      "severityOptions": {
+        "high": "Високий",
+        "medium": "Середній",
+        "low": "Низький"
+      },
+      "reasonOptions": {
+        "crisis_indicators": "Кризові індикатори",
+        "self_harm_language": "Мова самоушкодження",
+        "inappropriate_ai_response": "Неналежна відповідь ШІ",
+        "ethical_concern": "Етичне занепокоєння",
+        "other_safety_concern": "Інше занепокоєння щодо безпеки"
+      }
+    },
+    "queue": {
+      "title": "Черга рецензування",
+      "subtitle": "Рецензуйте та оцінюйте чат-сесії",
+      "tabsAriaLabel": "Вкладки черги рецензування",
+      "tabs": {
+        "pending": "Очікують",
+        "flagged": "Позначені",
+        "in_progress": "В процесі",
+        "completed": "Завершені"
+      },
+      "scope": {
+        "label": "Область",
+        "allSpaces": "Усі простори",
+        "selectedSpace": "Поточний простір",
+        "selectedSpaceUnavailable": "Простір недоступний",
+        "loadingSpaces": "Завантаження просторів..."
+      },
+      "filters": {
+        "toggle": "Фільтри",
+        "riskLevel": "Рівень ризику",
+        "allRiskLevels": "Усі рівні ризику",
+        "language": "Мова",
+        "allLanguages": "Усі мови",
+        "languageEn": "Англійська",
+        "languageUk": "Українська",
+        "languageRu": "Російська",
+        "dateFrom": "Від",
+        "dateTo": "До",
+        "sortBy": "Сортувати за",
+        "sortPriority": "Пріоритетом",
+        "sortOldest": "Найстаріші",
+        "sortNewest": "Найновіші",
+        "assignedToMe": "Призначені мені",
+        "clearAll": "Очистити все"
+      },
+      "assign": {
+        "title": "Призначити рецензента",
+        "placeholder": "Оберіть рецензента...",
+        "confirm": "Призначити",
+        "cancel": "Скасувати"
+      },
+      "empty": {
+        "title": "Немає сесій для рецензування",
+        "description": "Немає сесій, що відповідають поточним фільтрам."
+      },
+      "error": {
+        "title": "Не вдалося завантажити чергу",
+        "retry": "Повторити"
+      },
+      "pagination": {
+        "ariaLabel": "Пагінація",
+        "previous": "Попередня",
+        "next": "Наступна",
+        "pageInfo": "Сторінка {{current}} з {{total}}",
+        "showing": "Показано {{start}}-{{end}} з {{total}}"
+      }
+    },
+    "ratingPanel": {
+      "title": "Ваша оцінка",
+      "commentLabel": "Коментар",
+      "commentPlaceholder": "Додайте коментар до рецензії...",
+      "commentAriaLabel": "Коментар рецензії",
+      "saving": "Збереження...",
+      "saved": "Збережено",
+      "autoSaveHint": "Оцінки зберігаються автоматично",
+      "saveError": "Не вдалося зберегти. Повторіть спробу."
+    },
+    "riskLevels": {
+      "high": "Високий",
+      "medium": "Середній",
+      "low": "Низький",
+      "none": "Немає"
+    },
+    "score": {
+      "labels": {
+        "1": "Неприйнятно",
+        "2": "Дуже погано",
+        "3": "Погано",
+        "4": "Нижче середнього",
+        "5": "Середньо",
+        "6": "Вище середнього",
+        "7": "Добре",
+        "8": "Дуже добре",
+        "9": "Відмінно",
+        "10": "Видатно"
+      }
+    },
+    "scoreSelector": {
+      "label": "Оцінка",
+      "ariaLabel": "Оберіть оцінку від 1 до 10",
+      "buttonAriaLabel": "Оцінка {{score}}"
+    },
+    "session": {
+      "title": "Сесія рецензування",
+      "loading": "Завантаження сесії...",
+      "transcript": "Транскрипт",
+      "roleAssistant": "Асистент",
+      "roleUser": "Користувач",
+      "assistantMessageAriaLabel": "Оцінити це повідомлення асистента",
+      "rateMessage": "Оцінити повідомлення",
+      "rateAll": "Оцінити всі повідомлення",
+      "rated": "Оцінено",
+      "noMessagesTitle": "Немає повідомлень",
+      "noMessagesDescription": "Ця сесія не має повідомлень для рецензування.",
+      "submitReview": "Надіслати рецензію",
+      "submitting": "Надсилання...",
+      "submitted": "Рецензію надіслано",
+      "complete": "Завершено",
+      "blinded": "Засліплено",
+      "tiebreaker": "Вирішальна рецензія",
+      "disputed": "Оскаржено",
+      "disputedClosed": "Оскарження закрито",
+      "flags": "Прапорці",
+      "reviewCount": "{{count}} рецензій",
+      "allReviews": "Усі рецензії",
+      "aggregateScore": "Загальна оцінка",
+      "scoreRange": "{{min}} – {{max}}"
+    },
+    "sessionCard": {
+      "ariaLabel": "Картка сесії рецензування",
+      "messageCount": "{{count}} повідомлень",
+      "riskLevel": "Ризик: {{level}}",
+      "reviewProgress": "{{completed}} / {{required}} рецензій",
+      "progressAriaLabel": "Прогрес рецензування",
+      "assignedTo": "Призначено",
+      "assign": "Призначити",
+      "autoFlagged": "Автопозначено",
+      "expired": "Прострочено",
+      "expiresIn": "Спливає через {{hours}} год {{minutes}} хв",
+      "expiresInMinutes": "Спливає через {{minutes}} хв"
+    },
+    "tags": {
+      "title": "Теги",
+      "tagManagement": "Керування тегами",
+      "createNew": "Створити новий тег",
+      "tagName": "Назва тегу",
+      "tagLabel": "Мітка",
+      "tagDescription": "Опис",
+      "category": "Категорія",
+      "categoryChat": "Тег чату",
+      "categoryUser": "Тег користувача",
+      "excludeFromReviews": "Виключає з рецензування",
+      "active": "Активний",
+      "inactive": "Неактивний",
+      "editTag": "Редагувати",
+      "deleteTag": "Видалити",
+      "confirmDelete": "Видалити тег",
+      "confirmDeleteDescription": "Ви впевнені, що хочете видалити цей тег? Цю дію неможливо скасувати.",
+      "duplicateError": "Тег з такою назвою вже існує",
+      "noTags": "Тегів не знайдено",
+      "addTag": "Додати тег...",
+      "assignTag": "Призначити тег",
+      "loadError": "Не вдалося завантажити теги",
+      "filter": "Фільтр за тегом",
+      "excluded": "Виключені",
+      "excludedSessions": "Виключені сесії",
+      "exclusionReason": "Причина виключення"
+    },
+    "time": {
+      "justNow": "Щойно",
+      "minutesAgo": "{{count}} хв тому",
+      "hoursAgo": "{{count}} год тому",
+      "daysAgo": "{{count}} дн тому"
+    },
+    "progress": {
+      "rated": "{{rated}} з {{total}} оцінено",
+      "readyToSubmit": "Готово до відправки",
+      "notReady": "Оцініть усі повідомлення для відправки",
+      "ariaLabel": "{{rated}} з {{total}} повідомлень оцінено"
+    },
+    "notifications": {
+      "title": "Сповіщення",
+      "markAllRead": "Позначити все як прочитане",
+      "empty": "Немає сповіщень",
+      "banners": {
+        "escalations": "{{count}} ескалацій потребують уваги",
+        "deanonymizations": "{{count}} запитів на деанонімізацію очікують",
+        "overdue": "{{count}} прострочених рецензій"
+      }
+    },
+    "deanonymization": {
+      "title": "Деанонімізація",
+      "request": "Запит деанонімізації",
+      "submitted": "Запит надіслано",
+      "category": "Категорія обґрунтування",
+      "details": "Деталі",
+      "detailsMin": "Мінімум 10 символів",
+      "submit": "Надіслати запит",
+      "pending": "Очікує",
+      "approved": "Схвалено",
+      "denied": "Відхилено",
+      "accessExpired": "Доступ закінчився",
+      "accessExpires": "Спливає через {{time}}",
+      "revealError": "Не вдалося розкрити особу",
+      "revealedIdentity": "Розкрити особу",
+      "approveConfirm": "Схвалити деанонімізацію?",
+      "approveConfirmDetail": "Це надасть тимчасовий доступ до персональної інформації.",
+      "approve": "Схвалити",
+      "deny": "Відхилити",
+      "denialNotes": "Примітки до відхилення...",
+      "fieldName": "Ім'я",
+      "fieldEmail": "Електронна пошта",
+      "welfareCheck": "Перевірка благополуччя",
+      "legalRequirement": "Юридична вимога",
+      "clinicalEscalation": "Клінічна ескалація",
+      "investigation": "Розслідування",
+      "justification": "Деталі обґрунтування",
+      "justificationPlaceholder": "Поясніть, чому потрібна деанонімізація (мін. 10 символів)..."
+    },
+    "dashboard": {
+      "title": "Моя панель",
+      "teamTitle": "Панель команди",
+      "noData": "Дані відсутні",
+      "scoreDistribution": "Розподіл оцінок",
+      "criteriaBreakdown": "Розбивка за критеріями",
+      "weeklyTrend": "Тижневий тренд",
+      "queueDepth": "Глибина черги",
+      "stats": {
+        "reviewsCompleted": "Завершено рецензій",
+        "averageScore": "Середня оцінка",
+        "agreementRate": "Рівень згоди",
+        "totalReviews": "Всього рецензій",
+        "teamAverage": "Середнє по команді",
+        "interRaterReliability": "Міжрецензентна надійність",
+        "pendingEscalations": "Очікуючі ескалації",
+        "pendingDeanonymizations": "Очікуючі деанонімізації"
+      },
+      "workload": {
+        "title": "Навантаження рецензентів",
+        "reviewer": "Рецензент",
+        "completed": "Завершено",
+        "inProgress": "В процесі",
+        "average": "Середнє"
+      }
+    },
+    "reports": {
+      "title": "Звіти та аналітика",
+      "type": "Тип звіту",
+      "reportType": "Тип звіту",
+      "from": "Від",
+      "dateFrom": "Від",
+      "to": "До",
+      "dateTo": "До",
+      "format": "Формат",
+      "generating": "Генерація...",
+      "generate": "Згенерувати звіт",
+      "preview": "Результат",
+      "downloaded": "Звіт завантажено:"
+    },
+    "errorBoundary": {
+      "title": "Щось пішло не так",
+      "description": "У модулі рецензування сталася помилка. Будь ласка, спробуйте ще раз.",
+      "retry": "Спробувати ще"
+    }
+  },
+  "settings": {
+    "title": "Налаштування",
+    "subtitle": "Керуйте вашими налаштуваннями",
+    "showTechnicalDetails": "Показати технічні деталі",
+    "profile": {
+      "title": "Профіль"
+    },
+    "privacy": {
+      "title": "Конфіденційність",
+      "piiMasking": "Приховування PII",
+      "piiMaskingDesc": "Приховати персональну інформацію в Робочому просторі"
+    },
+    "notifications": {
+      "title": "Сповіщення",
+      "email": "Email-сповіщення",
+      "emailDesc": "Отримувати оновлення електронною поштою",
+      "browser": "Браузерні сповіщення",
+      "browserDesc": "Показувати сповіщення на робочому столі",
+      "digest": "Щотижневий дайджест",
+      "digestDesc": "Підсумок активності кожного тижня"
+    },
+    "appearance": {
+      "title": "Зовнішній вигляд",
+      "light": "Світла",
+      "dark": "Темна",
+      "system": "Системна"
+    },
+    "language": {
+      "title": "Мова та регіон",
+      "language": "Мова",
+      "timezone": "Часовий пояс"
+    },
+    "admin": {
+      "title": "Адмін‑налаштування",
+      "subtitle": "Глобальні налаштування гостьового доступу та схвалень",
+      "reload": "Оновити",
+      "guestMode": "Гостьовий режим",
+      "guestModeDesc": "Дозволити неавторизованим користувачам почати чат",
+      "cooloffDays": "Період очікування (днів)",
+      "cooloffDaysDesc": "Днів до повторної заявки після відхилення",
+      "otpDisable": "Вимкнути OTP вхід для Workbench",
+      "otpDisableDesc": "Коли увімкнено, користувачі Workbench зможуть входити лише через Google. Вхід по email буде приховано.",
+      "save": "Зберегти"
+    },
+    "save": "Зберегти зміни"
+  },
+  "roles": {
+    "user": "Користувач",
+    "qa_specialist": "QA-спеціаліст",
+    "researcher": "Дослідник",
+    "supervisor": "Супервізор",
+    "moderator": "Модератор",
+    "group_admin": "Адміністратор групи",
+    "owner": "Власник"
+  },
+  "supervision": {
+    "title": "Рецензія супервізора",
+    "queue": "Черга супервізії",
+    "queueEmpty": "Немає рецензій для супервізії",
+    "chatTranscript": "Стенограма чату",
+    "reviewerAssessment": "Оцінка рецензента",
+    "messageRatings": "Оцінки повідомлень",
+    "message": "Повідомлення",
+    "priorDecisions": "Попередні рішення",
+    "yourDecision": "Ваше рішення",
+    "approve": "Схвалити",
+    "disapprove": "Відхилити",
+    "comments": "Коментарі",
+    "commentsPlaceholder": "Поясніть ваше рішення...",
+    "returnToReviewer": "Повернути рецензенту на доопрацювання",
+    "submitDecision": "Надіслати рішення",
+    "iteration": "Ітерація",
+    "contextNotFound": "Контекст супервізії не знайдено",
+    "noMessages": "Повідомлення не знайдено",
+    "reviewer": "Рецензент",
+    "submitted": "Надіслано",
+    "messages": "Повідомлення",
+    "group": "Група",
+    "awaitingFeedback": "Очікує відгуку",
+    "awaitingEmpty": "Немає рецензій, що очікують вашого відгуку",
+    "supervisorDecision": "Рішення супервізора",
+    "viewDetails": "Деталі",
+    "tab": {
+      "transcript": "Транскрипт",
+      "assessment": "Оцінка",
+      "decision": "Рішення"
+    }
+  },
+  "gradeDescription": {
+    "title": "Описи оцінок",
+    "editTooltip": "Редагувати опис",
+    "save": "Зберегти",
+    "cancel": "Скасувати"
+  },
+  "groupConfig": {
+    "title": "Налаштування рецензування групи",
+    "reviewerCountOverride": "Кількість рецензентів",
+    "supervisionPolicy": "Політика супервізії",
+    "samplePercentage": "Відсоток вибірки",
+    "useGlobalDefault": "Використовувати глобальне значення",
+    "save": "Зберегти",
+    "reset": "Скинути до глобальних"
+  },
+  "groupUserCreation": {
+    "checkEmail": "Перевірити",
+    "userFound": "Користувача знайдено: {{name}}. Натисніть Додати, щоб додати до групи.",
+    "notFound": "Обліковий запис не знайдено — створити нового користувача",
+    "displayName": "Ім'я",
+    "namePlaceholder": "Введіть повне ім'я",
+    "role": "Роль",
+    "nameRequired": "Ім'я обов'язкове для створення нового користувача",
+    "alreadyMember": "Цей користувач вже є учасником цієї групи",
+    "invitationSent": "Користувача створено та додано до групи"
+  },
+  "common": {
+    "loading": "Завантаження...",
+    "error": "Помилка",
+    "success": "Успішно",
+    "cancel": "Скасувати",
+    "show": "Показати",
+    "hide": "Сховати",
+    "save": "Зберегти",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "view": "Переглянути",
+    "search": "Пошук",
+    "filter": "Фільтр",
+    "or": "або",
+    "all": "Всі",
+    "none": "Немає",
+    "yes": "Так",
+    "no": "Ні",
+    "back": "Назад",
+    "next": "Далі",
+    "previous": "Попередній",
+    "signOut": "Вийти",
+    "notFound": "Не знайдено",
+    "saving": "Збереження...",
+    "confirm": "Підтвердити",
+    "creating": "Створення..."
+  },
+  "survey": {
+    "status": { "draft": "Чернетка", "published": "Опублікована", "archived": "Архівована" },
+    "instanceStatus": { "draft": "Заплановано", "active": "Активна", "expired": "Завершена", "closed": "Закрита" },
+    "dataType": {
+      "group": {
+        "numeric": "Числові",
+        "dateTime": "Дата / Час",
+        "ratingScale": "Шкала оцінювання",
+        "presets": "Текстові шаблони",
+        "text": "Текст"
+      },
+      "integerSigned": "Ціле (зі знаком)",
+      "integerUnsigned": "Ціле (без знаку)",
+      "decimal": "Десяткове",
+      "date": "Дата",
+      "time": "Час",
+      "datetime": "Дата і час",
+      "ratingScale": "Шкала оцінювання",
+      "email": "Email",
+      "phone": "Телефон",
+      "url": "URL",
+      "postalCode": "Поштовий індекс",
+      "alphanumericCode": "Буквено-цифровий код",
+      "text": "Текст (власний)"
+    },
+    "ratingScale": {
+      "startValue": "Початкове значення",
+      "endValue": "Кінцеве значення",
+      "step": "Крок",
+      "segmentCount": "{{count}} сегментів",
+      "invalidConfig": "Некоректна конфігурація: діапазон має ділитися на крок без залишку"
+    },
+    "condition": {
+      "add": "+ Додати умову",
+      "remove": "Видалити умову",
+      "ifLabel": "Показати, якщо",
+      "equals": "дорівнює",
+      "notEquals": "не дорівнює",
+      "in": "одне з",
+      "contains": "містить",
+      "selectValue": "Оберіть значення...",
+      "valuePlaceholder": "Значення",
+      "dependsOn": "Залежить від П{{order}}",
+      "dependsOnShort": "П{{order}}",
+      "addCondition": "Додати умову",
+      "removeCondition": "Видалити",
+      "combinator": {
+        "and": "ТА",
+        "or": "АБО"
+      },
+      "operator": {
+        "not_in": "не є одним із"
+      },
+      "multiValue": {
+        "addValue": "Додати значення",
+        "placeholder": "Введіть та натисніть Enter"
+      },
+      "staleRemoved": "Умова посилається на видалене питання — видалено"
+    },
+    "option": {
+      "freetextLabel": "Увімкнути введення тексту",
+      "freetextRequired": "Обов'язкове введення тексту",
+      "freetextType": {
+        "string": "Текст",
+        "number": "Число"
+      }
+    },
+    "preview": {
+      "title": "Попередній перегляд видимості",
+      "show": "Попередній перегляд",
+      "hide": "Сховати перегляд",
+      "hidden": "Приховано",
+      "reset": "Скинути відповіді",
+      "visibleCount": "{{visible}} з {{total}} видимі",
+      "button": "Перегляд",
+      "open": "Переглянути опитування",
+      "exit": "Вийти з перегляду",
+      "badge": "Режим перегляду",
+      "noQuestions": "Додайте хоча б одне запитання для перегляду"
+    },
+    "autosave": {
+      "saving": "Збереження...",
+      "saved": "Збережено",
+      "failed": "Помилка збереження",
+      "retry": "Повторити"
+    },
+    "conflict": {
+      "title": "Схему оновлено ззовні",
+      "message": "Інший користувач змінив цю схему. Перезавантажте, щоб побачити зміни, або продовжуйте редагування (ваше наступне збереження перезапише їхні зміни).",
+      "reload": "Перезавантажити",
+      "continue": "Продовжити редагування"
+    },
+    "freetext": {
+      "placeholder": "Введіть вашу відповідь...",
+      "placeholderNumber": "Введіть число..."
+    },
+    "export": {
+      "button": "Експорт"
+    },
+    "import": {
+      "button": "Імпорт",
+      "title": "Імпорт схеми опитування",
+      "dragDrop": "Перетягніть JSON-файл сюди або",
+      "importing": "Імпортування...",
+      "browse": "Оберіть файл",
+      "hint": "JSON-файли до 5 МБ",
+      "validationFailed": "Помилка валідації"
+    },
+    "schemas": {
+      "title": "Схеми опитувань", "create": "Нова схема", "showArchived": "Показати архівовані", "empty": "Схем опитувань ще немає.",
+      "clone": "Клонувати", "archive": "Архівувати", "restore": "Відновити", "createFailed": "Не вдалося створити схему",
+      "col": { "title": "Назва", "status": "Статус", "questions": "Питання", "created": "Створено", "published": "Опубліковано", "actions": "Дії" }
+    },
+    "schema": {
+      "untitled": "Без назви", "editTitle": "Редагувати схему", "viewTitle": "Перегляд схеми", "publish": "Опублікувати",
+      "notFound": "Схему не знайдено", "titleLabel": "Назва", "descriptionLabel": "Опис", "questionsHeading": "Питання"
+    },
+    "publish": { "confirmTitle": "Опублікувати схему?", "confirmMessage": "Після публікації схема стає незмінною — питання та налаштування не можна змінити. Пізніше можна створити копію для редагування.", "confirm": "Так, опублікувати" },
+    "question": { "add": "Додати питання", "required": "Обов'язкове", "riskFlag": "Прапорець ризику", "minValue": "Мін. значення", "maxValue": "Макс. значення", "min": "Мін.", "max": "Макс.", "dataType": "Тип даних", "textPlaceholder": "Введіть текст питання...", "options": "Варіанти", "option": "Варіант", "addOption": "Додати варіант", "minLength": "Мін. довжина", "maxLength": "Макс. довжина", "regex": "Regex", "type": { "free_text": "Вільний текст", "integer_signed": "Ціле (зі знаком)", "integer_unsigned": "Ціле (без знаку)", "decimal": "Десяткове", "date": "Дата", "time": "Час", "datetime": "Дата і час", "email": "Email", "phone": "Телефон", "url": "URL", "postal_code": "Поштовий індекс", "alphanumeric_code": "Буквено-цифровий код", "rating_scale": "Шкала оцінювання", "single_choice": "Один вибір", "multi_choice": "Декілька варіантів", "boolean": "Так / Ні" } },
+    "questionType": { "group": { "numeric": "Числові", "dateTime": "Дата / Час", "ratingScale": "Шкала оцінювання", "presets": "Текстові шаблони", "text": "Текст", "selection": "Вибір" } },
+    "instances": {
+      "title": "Екземпляри опитувань", "create": "Новий екземпляр", "empty": "Екземплярів ще немає.",
+      "col": { "title": "Назва", "status": "Статус", "groups": "Групи", "start": "Початок", "expiry": "Закінчення", "completed": "Завершено" }
+    },
+    "instance": {
+      "createTitle": "Створити екземпляр", "schema": "Схема", "selectSchema": "Виберіть опубліковану схему...", "groups": "Цільові групи", "noGroups": "Немає груп", "priority": "Пріоритет",
+      "addToMemory": "Додати до памʼяті", "publicHeader": "Публічний заголовок", "publicHeaderPlaceholder": "Заголовок для користувачів (необов'язково)", "showReview": "Показати крок перегляду", "startDate": "Дата початку", "expirationDate": "Дата закінчення", "create": "Створити", "requiredFields": "Усі поля обов'язкові",
+      "expiryAfterStart": "Дата закінчення має бути після дати початку", "createFailed": "Не вдалося створити", "notFound": "Екземпляр не знайдено",
+      "details": "Деталі", "groupCount": "група(и)", "close": "Закрити екземпляр", "viewResponses": "Переглянути відповіді", "snapshot": "Знімок схеми"
+    },
+    "responses": { "title": "Відповіді", "empty": "Відповідей ще немає.", "complete": "Завершено", "partial": "Частково", "started": "Розпочато", "completed": "Завершено", "notShown": "Не показано", "hideNonVisible": "Приховати невидимі відповіді" },
+    "invalidation": { "invalidateAll": "Анулювати всі результати", "invalidateGroup": "Анулювати результати групи", "invalidateOne": "Анулювати", "invalidated": "Анулювано", "invalidatedAt": "Анулювано", "group": "Група", "selectGroup": "Вибрати групу", "reasonPrompt": "Причина анулювання (необов'язково)" },
+    "groupSurveys": { "title": "Опитування групи", "tab": "Опитування", "empty": "Опитувань у цій групі немає.", "completed": "{{count}} завершено", "downloadJson": "Завантажити JSON", "downloadCsv": "Завантажити CSV" }
+  },
+  "surveyGate": {
+    "checking": "Перевірка опитувань...",
+    "retry": "Спробувати знову",
+    "progress": "Питання {{current}} з {{total}}",
+    "next": "Далі",
+    "back": "Назад",
+    "review": "Переглянути відповіді",
+    "reviewTitle": "Перевірте ваші відповіді",
+    "edit": "Редагувати",
+    "submit": "Надіслати",
+    "submitting": "Надсилання...",
+    "close": "Закрити",
+    "requiredError": "Це питання є обов'язковим.",
+    "yes": "Так",
+    "no": "Ні",
+    "noAnswer": "Немає відповіді",
+    "typeAnswer": "Введіть вашу відповідь...",
+    "submitError": "Не вдалося надіслати. Спробуйте ще раз.",
+    "validation": {
+      "integerSigned": "Введіть коректне ціле число",
+      "integerUnsigned": "Введіть невід'ємне ціле число",
+      "decimal": "Введіть коректне десяткове число",
+      "email": "Введіть коректну email адресу",
+      "phone": "Введіть коректний номер телефону",
+      "url": "Введіть коректний URL",
+      "postal_code": "Введіть коректний поштовий індекс",
+      "alphanumeric_code": "Використовуйте лише літери та цифри"
+    }
+  }
+}
+

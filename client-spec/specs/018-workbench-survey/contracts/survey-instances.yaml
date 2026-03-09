@@ -1,0 +1,390 @@
+openapi: 3.0.3
+info:
+  title: Survey Instances API
+  version: 1.0.0
+  description: Workbench endpoints for survey instance management
+
+paths:
+  /api/workbench/survey-instances:
+    get:
+      summary: List survey instances
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, active, expired, closed]
+        - name: schemaId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of instances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SurveyInstanceListItem'
+
+    post:
+      summary: Create instance from published schema
+      description: Schema must be published. startDate and expirationDate required. expirationDate must be > startDate.
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schemaId, groupIds, startDate, expirationDate]
+              properties:
+                schemaId:
+                  type: string
+                  format: uuid
+                groupIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 1
+                priority:
+                  type: integer
+                  default: 0
+                addToMemory:
+                  type: boolean
+                  default: false
+                  description: When true, completion upserts canonical survey memory for this instance
+                startDate:
+                  type: string
+                  format: date-time
+                expirationDate:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Instance created with frozen schema snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveyInstance'
+        '422':
+          description: |
+            Validation error. Possible causes:
+            - Schema is not published
+            - Missing startDate or expirationDate
+            - expirationDate <= startDate
+            - Empty groupIds
+
+  /api/workbench/survey-instances/{id}:
+    get:
+      summary: Get instance detail
+      description: Includes schema snapshot and completion statistics.
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      responses:
+        '200':
+          description: Instance detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SurveyInstanceDetail'
+
+  /api/workbench/survey-instances/{id}/close:
+    post:
+      summary: Manually close active instance
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      responses:
+        '200':
+          description: Instance closed
+        '403':
+          description: Not authorized
+        '422':
+          description: Instance is not active
+
+  /api/workbench/survey-instances/{id}/responses:
+    get:
+      summary: List responses for instance
+      description: Researcher and Admin only. Returns pseudonymous responses.
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - name: isComplete
+          in: query
+          schema:
+            type: boolean
+          description: Filter by completion status
+      responses:
+        '200':
+          description: List of responses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SurveyResponseDetail'
+        '403':
+          description: Supervisor role — access denied to individual responses
+
+  /api/workbench/survey-instances/{id}/invalidate:
+    post:
+      summary: Invalidate all results for an instance
+      description: Marks all responses for this instance invalidated. Does not delete data.
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Instance invalidated
+
+  /api/workbench/survey-instances/{id}/invalidate-group:
+    post:
+      summary: Invalidate results for a group within an instance
+      description: Marks responses invalidated where response.groupId matches the provided groupId.
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [groupId]
+              properties:
+                groupId:
+                  type: string
+                  format: uuid
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Group-scope invalidation applied
+
+  /api/workbench/survey-responses/{id}/invalidate:
+    post:
+      summary: Invalidate an individual response
+      tags: [Survey Instances]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Response invalidated
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    InstanceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    SurveyInstance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        schemaId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, expired, closed]
+        priority:
+          type: integer
+        addToMemory:
+          type: boolean
+        groupIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        startDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    SurveyInstanceListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, expired, closed]
+        priority:
+          type: integer
+        addToMemory:
+          type: boolean
+        groupIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        startDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+        completedCount:
+          type: integer
+          description: Count of completed responses
+        totalAssigned:
+          type: integer
+          description: Total users in assigned groups (optional)
+
+    SurveyInstanceDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SurveyInstance'
+        - type: object
+          properties:
+            schemaSnapshot:
+              type: object
+              description: Full frozen schema at instance creation time
+            completedCount:
+              type: integer
+            totalResponses:
+              type: integer
+
+    SurveyResponseDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        instanceId:
+          type: string
+          format: uuid
+        pseudonymousId:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurveyAnswer'
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        isComplete:
+          type: boolean
+        invalidatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        invalidatedBy:
+          type: string
+          format: uuid
+          nullable: true
+        invalidationReason:
+          type: string
+          nullable: true
+
+    SurveyAnswer:
+      type: object
+      properties:
+        questionId:
+          type: string
+          format: uuid
+        value:
+          description: string, string[], boolean, or null depending on question type

@@ -1,0 +1,16 @@
+{
+  "name": "@mentalhelpglobal/chat-ui",
+  "private": true,
+  "version": "1.0.0",
+  "description": "E2E tests for Mental Health Chat application",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/pg": "^8.11.0",
+    "pg": "^8.13.0"
+  }
+}

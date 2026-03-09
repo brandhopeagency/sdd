@@ -1,0 +1,98 @@
+name: UI E2E (Dev)
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Deployed dev UI entrypoint (index.html)"
+        required: true
+        default: "https://storage.googleapis.com/mental-help-global-25-dev-frontend/index.html"
+      email:
+        description: "Email used for OTP login (devCode in browser console)"
+        required: true
+        default: "playwright@mentalhelp.global"
+      debug_pw_api:
+        description: "Enable Playwright DEBUG=pw:api (very verbose)"
+        required: true
+        type: boolean
+        default: false
+  workflow_run:
+    workflows: ["Deploy to GCP"]
+    branches: [develop]
+    types:
+      - completed
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop')
+      }}
+    env:
+      # Avoid referencing `inputs.*` in non-workflow_dispatch events to prevent workflow parsing issues.
+      PLAYWRIGHT_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.base_url || 'https://storage.googleapis.com/mental-help-global-25-dev-frontend/index.html' }}
+      PLAYWRIGHT_EMAIL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.email || 'playwright@mentalhelp.global' }}
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Run UI E2E (dev)
+        env:
+          DEBUG: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.debug_pw_api == 'true') && 'pw:api' || '' }}
+        run: |
+          echo "PLAYWRIGHT_BASE_URL=$PLAYWRIGHT_BASE_URL"
+          echo "PLAYWRIGHT_EMAIL=$PLAYWRIGHT_EMAIL"
+          npx playwright test --reporter=line,html --retries=1 --timeout=90000
+
+      - name: Print steps-to-reproduce from failures (if any)
+        if: failure()
+        run: |
+          echo "=== Steps to reproduce (from test-results/**/repro.md) ==="
+          if [ -d "test-results" ]; then
+            find test-results -type f -name "repro.md" -print -exec echo "-----" \; -exec cat {} \; -exec echo "" \;
+          else
+            echo "No test-results directory found."
+          fi
+
+      - name: Ensure test-results artifact exists (avoid upload warning)
+        if: always()
+        run: |
+          mkdir -p test-results
+          # Playwright may clean outputDir at start; ensure at least one file exists for upload-artifact on green runs.
+          test -f test-results/keep.txt || echo "ok $(date -u +%FT%TZ)" > test-results/keep.txt
+
+      - name: Upload test-results (incl. screenshots, repro.md, browser logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: warn
+          retention-days: 14
+
+

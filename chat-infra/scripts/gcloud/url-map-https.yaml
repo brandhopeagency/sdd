@@ -1,0 +1,61 @@
+name: mhg-domain-https-map
+defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendBuckets/bes-frontend-prod
+hostRules:
+  # ── Chat frontend domains ──
+  - hosts:
+      - mentalhelp.chat
+    pathMatcher: prod-matcher
+  - hosts:
+      - dev.mentalhelp.chat
+    pathMatcher: dev-matcher
+  - hosts:
+      - www.mentalhelp.chat
+    pathMatcher: www-redirect-matcher
+  # ── Chat API domains ──
+  - hosts:
+      - api.mentalhelp.chat
+    pathMatcher: api-prod-matcher
+  - hosts:
+      - api.dev.mentalhelp.chat
+    pathMatcher: api-dev-matcher
+  # ── Workbench frontend domains ──
+  - hosts:
+      - workbench.mentalhelp.chat
+    pathMatcher: workbench-prod-matcher
+  - hosts:
+      - workbench.dev.mentalhelp.chat
+    pathMatcher: workbench-dev-matcher
+  # ── Workbench API domains ──
+  - hosts:
+      - api.workbench.mentalhelp.chat
+    pathMatcher: workbench-api-prod-matcher
+  - hosts:
+      - api.workbench.dev.mentalhelp.chat
+    pathMatcher: workbench-api-dev-matcher
+pathMatchers:
+  # ── Chat frontend path matchers (GCS backend buckets) ──
+  - name: prod-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendBuckets/bes-frontend-prod
+  - name: dev-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendBuckets/bes-frontend-dev
+  - name: www-redirect-matcher
+    defaultUrlRedirect:
+      hostRedirect: mentalhelp.chat
+      httpsRedirect: true
+      redirectResponseCode: MOVED_PERMANENTLY_DEFAULT
+      stripQuery: false
+  # ── Chat API path matchers (Cloud Run backend services) ──
+  - name: api-prod-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendServices/bes-chat-backend-prod
+  - name: api-dev-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendServices/bes-chat-backend-dev
+  # ── Workbench frontend path matchers (GCS backend buckets) ──
+  - name: workbench-prod-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendBuckets/bes-frontend-workbench-prod
+  - name: workbench-dev-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendBuckets/bes-frontend-workbench-dev
+  # ── Workbench API path matchers (serverless NEG backend services) ──
+  - name: workbench-api-prod-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendServices/bes-workbench-api-prod
+  - name: workbench-api-dev-matcher
+    defaultService: https://www.googleapis.com/compute/v1/projects/mental-help-global-25/global/backendServices/bes-workbench-api-dev

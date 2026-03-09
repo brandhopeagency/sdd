@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GitHub Configuration",
+  "description": "Repository list, environment configs, and branch protection rules. Used by setup-github.sh to configure all repositories.",
+  "type": "object",
+  "required": ["organization", "repositories"],
+  "properties": {
+    "organization": {
+      "type": "string",
+      "description": "GitHub organization name (e.g., MentalHelpGlobal)"
+    },
+    "branch_protection_defaults": {
+      "$ref": "#/definitions/BranchProtectionRule",
+      "description": "Default branch protection applied to all repos unless overridden"
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RepositoryConfig"
+      }
+    },
+    "environments": {
+      "type": "object",
+      "description": "Environment definitions keyed by name (dev, prod). Each references a separate config file.",
+      "additionalProperties": {
+        "$ref": "#/definitions/EnvironmentConfig"
+      }
+    }
+  },
+  "definitions": {
+    "RepositoryConfig": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Repository name (without owner prefix)"
+        },
+        "environments": {
+          "type": "array",
+          "description": "Environments to create on this repo",
+          "items": {
+            "type": "string",
+            "enum": ["dev", "prod"]
+          }
+        },
+        "branch_protection": {
+          "type": "array",
+          "description": "Branches to protect",
+          "items": {
+            "type": "string"
+          }
+        },
+        "has_deployments": {
+          "type": "boolean",
+          "description": "Whether this repo has CI/CD deployments (determines if env secrets/variables are set)",
+          "default": false
+        },
+        "branch_protection_override": {
+          "$ref": "#/definitions/BranchProtectionRule",
+          "description": "Override default branch protection for this repo"
+        }
+      }
+    },
+    "EnvironmentConfig": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Environment name"
+        },
+        "protection_rules": {
+          "type": "object",
+          "properties": {
+            "wait_timer": {
+              "type": "integer",
+              "description": "Minutes to wait before deployment",
+              "minimum": 0,
+              "maximum": 43200
+            },
+            "reviewers": {
+              "type": "array",
+              "description": "Required reviewers (user or team IDs)",
+              "items": {
+                "type": "object",
+                "required": ["type", "id"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["User", "Team"]
+                  },
+                  "id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "secrets": {
+          "type": "object",
+          "description": "Map of GitHub secret name to source. Value is either a Secret Manager secret name (prefixed with 'sm:') or a literal value.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "description": "Map of GitHub variable name to value",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "BranchProtectionRule": {
+      "type": "object",
+      "properties": {
+        "require_pr": {
+          "type": "boolean",
+          "description": "Require pull request reviews",
+          "default": true
+        },
+        "required_approvals": {
+          "type": "integer",
+          "description": "Minimum approving reviews",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 6
+        },
+        "dismiss_stale_reviews": {
+          "type": "boolean",
+          "description": "Dismiss approvals when new commits pushed",
+          "default": true
+        },
+        "require_status_checks": {
+          "type": "boolean",
+          "description": "Require passing CI checks",
+          "default": true
+        },
+        "status_checks": {
+          "type": "array",
+          "description": "Required status check names",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enforce_admins": {
+          "type": "boolean",
+          "description": "Apply rules to administrators",
+          "default": true
+        },
+        "allow_force_push": {
+          "type": "boolean",
+          "description": "Allow force pushes to protected branch",
+          "default": false
+        },
+        "allow_deletions": {
+          "type": "boolean",
+          "description": "Allow deletion of protected branch",
+          "default": false
+        },
+        "required_linear_history": {
+          "type": "boolean",
+          "description": "Require linear commit history (no merge commits)",
+          "default": false
+        },
+        "required_conversation_resolution": {
+          "type": "boolean",
+          "description": "Require all PR conversations to be resolved",
+          "default": true
+        }
+      }
+    }
+  }
+}

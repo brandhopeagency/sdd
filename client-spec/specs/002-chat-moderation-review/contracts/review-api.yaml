@@ -1,0 +1,1408 @@
+openapi: 3.1.0
+info:
+  title: Chat Moderation & Review API
+  version: 1.0.0
+  description: |
+    REST API for the Chat Moderation & Review System.
+    All endpoints require authentication via JWT token in Authorization header.
+    Review-specific permissions are enforced via review middleware.
+  contact:
+    name: MHG Engineering
+servers:
+  - url: /api
+    description: API base path
+
+tags:
+  - name: Queue
+    description: Review queue and assignment management
+  - name: Sessions
+    description: Session review workflow (view, rate, submit)
+  - name: Flags
+    description: Risk flagging and escalation
+  - name: Deanonymization
+    description: Controlled identity reveal workflow
+  - name: Dashboard
+    description: Reviewer and team statistics
+  - name: Notifications
+    description: In-app notification management
+  - name: Reports
+    description: Report generation and export
+  - name: Configuration
+    description: Admin review system configuration
+
+paths:
+  # ─── Queue ────────────────────────────────────────────────────────────
+  /review:
+    get:
+      tags: [Queue]
+      summary: Get review queue
+      description: |
+        Returns paginated list of sessions available for review.
+        Filtered by reviewer's language qualifications.
+        Permissions: REVIEW_ACCESS
+      parameters:
+        - name: tab
+          in: query
+          schema:
+            type: string
+            enum: [pending, flagged, in_progress, completed]
+            default: pending
+        - name: riskLevel
+          in: query
+          schema:
+            type: string
+            enum: [none, low, medium, high]
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: assignedToMe
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [priority, newest, oldest]
+            default: priority
+      responses:
+        '200':
+          description: Queue sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      sessions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/QueueSession'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+
+  /review/assign:
+    post:
+      tags: [Queue]
+      summary: Assign session to reviewer
+      description: |
+        Manually assign a session to a specific reviewer (24h reservation).
+        Permissions: REVIEW_ASSIGN (Moderator+)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId, reviewerId]
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+                reviewerId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # ─── Sessions ─────────────────────────────────────────────────────────
+  /review/sessions/{sessionId}:
+    get:
+      tags: [Sessions]
+      summary: Get session for review
+      description: |
+        Returns anonymized session with messages for review.
+        If reviewer has an existing review, includes their ratings.
+        Blinding enforced: no other reviewers' scores visible.
+        Permissions: REVIEW_ACCESS
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session with anonymized messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      session:
+                        $ref: '#/components/schemas/ReviewSession'
+                      messages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AnonymizedMessage'
+                      myReview:
+                        $ref: '#/components/schemas/SessionReviewWithRatings'
+                      reviewSummaries:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewSummary'
+                        description: Only populated when session is complete
+
+  /review/sessions/{sessionId}/start:
+    post:
+      tags: [Sessions]
+      summary: Start a review
+      description: |
+        Creates a new review record and transitions it to in_progress.
+        Fails if reviewer already reviewed this session or max reviews reached.
+        Permissions: REVIEW_SUBMIT
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      review:
+                        $ref: '#/components/schemas/SessionReview'
+
+  /review/sessions/{sessionId}/rate:
+    post:
+      tags: [Sessions]
+      summary: Rate an AI message
+      description: |
+        Submit or update a rating for a single AI message within the active review.
+        Criteria feedback required if score <= criteriaThreshold.
+        Permissions: REVIEW_SUBMIT
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messageId, score]
+              properties:
+                messageId:
+                  type: string
+                  format: uuid
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                comment:
+                  type: string
+                criteriaFeedback:
+                  type: array
+                  items:
+                    type: object
+                    required: [criterion, feedbackText]
+                    properties:
+                      criterion:
+                        type: string
+                        enum: [relevance, empathy, safety, ethics, clarity]
+                      feedbackText:
+                        type: string
+                        minLength: 10
+      responses:
+        '200':
+          description: Rating saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      rating:
+                        $ref: '#/components/schemas/MessageRating'
+
+  /review/sessions/{sessionId}/submit:
+    post:
+      tags: [Sessions]
+      summary: Submit completed review
+      description: |
+        Finalize and submit the review. All AI messages must be rated.
+        Triggers score aggregation and dispute detection if enough reviews.
+        Permissions: REVIEW_SUBMIT
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                overallComment:
+                  type: string
+      responses:
+        '200':
+          description: Review submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      review:
+                        $ref: '#/components/schemas/SessionReview'
+                      sessionStatus:
+                        type: string
+                        enum: [pending_review, in_review, complete, disputed]
+
+  # ─── Flags ────────────────────────────────────────────────────────────
+  /review/sessions/{sessionId}/flags:
+    get:
+      tags: [Flags]
+      summary: Get flags for session
+      description: |
+        Returns all risk flags for a session.
+        Permissions: REVIEW_ACCESS
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session flags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      flags:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RiskFlag'
+    post:
+      tags: [Flags]
+      summary: Create risk flag
+      description: |
+        Flag a session with severity, reason category, and details.
+        High-severity flags immediately notify moderators/commanders.
+        Optionally request deanonymization.
+        Permissions: REVIEW_FLAG
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [severity, reasonCategory, details]
+              properties:
+                severity:
+                  type: string
+                  enum: [high, medium, low]
+                reasonCategory:
+                  type: string
+                  enum: [crisis_indicators, self_harm_language, inappropriate_ai_response, ethical_concern, other_safety_concern]
+                details:
+                  type: string
+                  minLength: 1
+                requestDeanonymization:
+                  type: boolean
+                  default: false
+                deanonymizationJustification:
+                  type: string
+                  description: Required if requestDeanonymization is true
+      responses:
+        '201':
+          description: Flag created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      flag:
+                        $ref: '#/components/schemas/RiskFlag'
+                      notificationStatus:
+                        type: string
+                        enum: [delivered, pending]
+
+  /review/sessions/{sessionId}/flags/{flagId}/resolve:
+    post:
+      tags: [Flags]
+      summary: Resolve a risk flag
+      description: |
+        Moderator resolves a flag with notes.
+        Permissions: REVIEW_ESCALATION
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: flagId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolutionNotes]
+              properties:
+                resolutionNotes:
+                  type: string
+                  minLength: 1
+                action:
+                  type: string
+                  enum: [resolve, acknowledge, escalate]
+                  default: resolve
+      responses:
+        '200':
+          description: Flag resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # ─── Deanonymization ──────────────────────────────────────────────────
+  /review/deanonymization:
+    get:
+      tags: [Deanonymization]
+      summary: List deanonymization requests
+      description: |
+        Returns deanonymization requests. Commanders see pending requests.
+        Requesters see their own requests.
+        Permissions: REVIEW_DEANONYMIZE_REQUEST or REVIEW_DEANONYMIZE_APPROVE
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, denied]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Deanonymization requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      requests:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DeanonymizationRequest'
+                      total:
+                        type: integer
+
+  /review/deanonymization/{requestId}/approve:
+    post:
+      tags: [Deanonymization]
+      summary: Approve deanonymization
+      description: |
+        Commander approves a deanonymization request.
+        Sets time-limited access (default 72h).
+        Fully audit-logged.
+        Permissions: REVIEW_DEANONYMIZE_APPROVE
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Request approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /review/deanonymization/{requestId}/deny:
+    post:
+      tags: [Deanonymization]
+      summary: Deny deanonymization
+      description: |
+        Commander denies a deanonymization request with notes.
+        Requester is notified. Fully audit-logged.
+        Permissions: REVIEW_DEANONYMIZE_APPROVE
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notes]
+              properties:
+                notes:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Request denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /review/deanonymization/{requestId}/reveal:
+    get:
+      tags: [Deanonymization]
+      summary: Get revealed identity
+      description: |
+        Returns the revealed identity for an approved, non-expired request.
+        Only accessible by the original requester.
+        Access event is audit-logged.
+        Permissions: REVIEW_DEANONYMIZE_REQUEST
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Revealed identity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/RevealedIdentity'
+
+  # ─── Dashboard ────────────────────────────────────────────────────────
+  /review/dashboard/me:
+    get:
+      tags: [Dashboard]
+      summary: Get personal reviewer dashboard
+      description: |
+        Returns personal review statistics for the authenticated reviewer.
+        Permissions: REVIEW_ACCESS
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: month
+      responses:
+        '200':
+          description: Reviewer statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/ReviewerDashboardStats'
+
+  /review/dashboard/team:
+    get:
+      tags: [Dashboard]
+      summary: Get team dashboard
+      description: |
+        Returns team-level review statistics.
+        Permissions: REVIEW_TEAM_DASHBOARD (Senior Reviewer+)
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: month
+      responses:
+        '200':
+          description: Team statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/TeamDashboardStats'
+
+  /review/dashboard/banners:
+    get:
+      tags: [Dashboard]
+      summary: Get banner alert counts
+      description: |
+        Returns count of pending items requiring attention (role-based).
+        Permissions: REVIEW_ACCESS
+      responses:
+        '200':
+          description: Banner alert counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/BannerAlerts'
+
+  # ─── Notifications ────────────────────────────────────────────────────
+  /review/notifications:
+    get:
+      tags: [Notifications]
+      summary: Get notifications
+      description: |
+        Returns paginated notifications for the authenticated user.
+        Permissions: REVIEW_ACCESS
+      parameters:
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      notifications:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewNotification'
+                      unreadCount:
+                        type: integer
+                      total:
+                        type: integer
+
+  /review/notifications/{notificationId}/read:
+    post:
+      tags: [Notifications]
+      summary: Mark notification as read
+      description: Permissions REVIEW_ACCESS
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /review/notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      description: Permissions REVIEW_ACCESS
+      responses:
+        '200':
+          description: All marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # ─── Reports ──────────────────────────────────────────────────────────
+  /review/reports:
+    get:
+      tags: [Reports]
+      summary: List available reports
+      description: |
+        Returns metadata for available report types and recent generations.
+        Permissions: REVIEW_REPORTS
+      responses:
+        '200':
+          description: Report types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      reportTypes:
+                        type: array
+                        items:
+                          type: string
+                          enum: [daily_summary, weekly_performance, monthly_quality, escalation_report]
+
+  /review/reports/generate:
+    post:
+      tags: [Reports]
+      summary: Generate a report
+      description: |
+        Generates a report of the specified type for the given date range.
+        Returns report data in the requested format.
+        Permissions: REVIEW_REPORTS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, format, from, to]
+              properties:
+                type:
+                  type: string
+                  enum: [daily_summary, weekly_performance, monthly_quality, escalation_report]
+                format:
+                  type: string
+                  enum: [json, csv, pdf]
+                from:
+                  type: string
+                  format: date
+                to:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      metadata:
+                        $ref: '#/components/schemas/ReportMetadata'
+                      content:
+                        type: object
+                        description: Report content (varies by type)
+            text/csv:
+              schema:
+                type: string
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  # ─── Configuration ────────────────────────────────────────────────────
+  /admin/review/config:
+    get:
+      tags: [Configuration]
+      summary: Get review configuration
+      description: |
+        Returns current review system configuration.
+        Permissions: REVIEW_ACCESS
+      responses:
+        '200':
+          description: Current configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/ReviewConfiguration'
+    put:
+      tags: [Configuration]
+      summary: Update review configuration
+      description: |
+        Updates review system configuration. Only specified fields are changed.
+        Changes apply to new reviews only.
+        Permissions: REVIEW_CONFIGURE (Admin/Owner only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReviewConfigInput'
+      responses:
+        '200':
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/ReviewConfiguration'
+
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+
+    QueueSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        anonymousSessionId:
+          type: string
+          pattern: '^CHAT-[0-9]{4}$'
+        anonymousUserId:
+          type: string
+          pattern: '^USER-[0-9]{4}$'
+        messageCount:
+          type: integer
+        assistantMessageCount:
+          type: integer
+        reviewStatus:
+          type: string
+          enum: [pending_review, in_review, complete, disputed, disputed_closed]
+        reviewCount:
+          type: integer
+        reviewsRequired:
+          type: integer
+        riskLevel:
+          type: string
+          enum: [none, low, medium, high]
+        autoFlagged:
+          type: boolean
+        language:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        myReviewStatus:
+          type: string
+          enum: [pending, in_progress, completed, expired, not_started]
+        assignedReviewerId:
+          type: string
+          format: uuid
+        assignedExpiresAt:
+          type: string
+          format: date-time
+
+    ReviewSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        anonymousSessionId:
+          type: string
+        anonymousUserId:
+          type: string
+        reviewStatus:
+          type: string
+        reviewCount:
+          type: integer
+        reviewsRequired:
+          type: integer
+        riskLevel:
+          type: string
+        language:
+          type: string
+
+    AnonymizedMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          properties:
+            confidence:
+              type: number
+            intent:
+              type: string
+        isReviewable:
+          type: boolean
+
+    SessionReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        reviewerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, in_progress, completed, expired]
+        isTiebreaker:
+          type: boolean
+        averageScore:
+          type: number
+        overallComment:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    SessionReviewWithRatings:
+      allOf:
+        - $ref: '#/components/schemas/SessionReview'
+        - type: object
+          properties:
+            ratings:
+              type: array
+              items:
+                $ref: '#/components/schemas/MessageRating'
+
+    MessageRating:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        reviewId:
+          type: string
+          format: uuid
+        messageId:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          minimum: 1
+          maximum: 10
+        comment:
+          type: string
+        criteriaFeedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/CriteriaFeedback'
+
+    CriteriaFeedback:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ratingId:
+          type: string
+          format: uuid
+        criterion:
+          type: string
+          enum: [relevance, empathy, safety, ethics, clarity]
+        feedbackText:
+          type: string
+          minLength: 10
+
+    RiskFlag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        flaggedBy:
+          type: string
+          format: uuid
+        severity:
+          type: string
+          enum: [high, medium, low]
+        reasonCategory:
+          type: string
+          enum: [crisis_indicators, self_harm_language, inappropriate_ai_response, ethical_concern, other_safety_concern]
+        details:
+          type: string
+        status:
+          type: string
+          enum: [open, acknowledged, resolved, escalated]
+        assignedModeratorId:
+          type: string
+          format: uuid
+        resolutionNotes:
+          type: string
+        resolvedBy:
+          type: string
+          format: uuid
+        resolvedAt:
+          type: string
+          format: date-time
+        deanonymizationRequested:
+          type: boolean
+        isAutoDetected:
+          type: boolean
+        matchedKeywords:
+          type: array
+          items:
+            type: string
+        slaDeadline:
+          type: string
+          format: date-time
+        notificationDeliveryStatus:
+          type: string
+          enum: [delivered, pending, failed]
+
+    DeanonymizationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        targetUserId:
+          type: string
+          format: uuid
+        requesterId:
+          type: string
+          format: uuid
+        approverId:
+          type: string
+          format: uuid
+        riskFlagId:
+          type: string
+          format: uuid
+        justificationCategory:
+          type: string
+          enum: [welfare_check, legal_requirement, clinical_escalation, investigation]
+        justificationDetails:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, denied]
+        denialNotes:
+          type: string
+        accessExpiresAt:
+          type: string
+          format: date-time
+        accessedAt:
+          type: string
+          format: date-time
+
+    RevealedIdentity:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        realUserId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        accessExpiresAt:
+          type: string
+          format: date-time
+
+    ReviewSummary:
+      type: object
+      properties:
+        reviewId:
+          type: string
+          format: uuid
+        reviewerName:
+          type: string
+        averageScore:
+          type: number
+        isTiebreaker:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+
+    ReviewerDashboardStats:
+      type: object
+      properties:
+        reviewsCompleted:
+          type: integer
+        averageScoreGiven:
+          type: number
+        agreementRate:
+          type: number
+          description: Percentage of scores within variance threshold of session median
+        scoreDistribution:
+          $ref: '#/components/schemas/ScoreDistribution'
+        criteriaFeedbackCounts:
+          $ref: '#/components/schemas/CriteriaFeedbackCounts'
+        weeklyTrend:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyTrendPoint'
+
+    TeamDashboardStats:
+      type: object
+      properties:
+        totalReviews:
+          type: integer
+        averageTeamScore:
+          type: number
+        interRaterReliability:
+          type: number
+        pendingEscalations:
+          type: integer
+        pendingDeanonymizations:
+          type: integer
+        reviewerWorkload:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewerWorkloadEntry'
+        queueDepth:
+          $ref: '#/components/schemas/QueueDepth'
+
+    BannerAlerts:
+      type: object
+      properties:
+        highRiskEscalations:
+          type: integer
+        pendingDeanonymizations:
+          type: integer
+        overdueSlaCounts:
+          type: integer
+
+    ScoreDistribution:
+      type: object
+      properties:
+        outstanding:
+          type: integer
+        good:
+          type: integer
+        adequate:
+          type: integer
+        poor:
+          type: integer
+        unsafe:
+          type: integer
+
+    CriteriaFeedbackCounts:
+      type: object
+      properties:
+        relevance:
+          type: integer
+        empathy:
+          type: integer
+        safety:
+          type: integer
+        ethics:
+          type: integer
+        clarity:
+          type: integer
+
+    WeeklyTrendPoint:
+      type: object
+      properties:
+        week:
+          type: string
+        reviewsCompleted:
+          type: integer
+        averageScore:
+          type: number
+
+    ReviewerWorkloadEntry:
+      type: object
+      properties:
+        reviewerId:
+          type: string
+          format: uuid
+        reviewerName:
+          type: string
+        reviewsCompleted:
+          type: integer
+        reviewsInProgress:
+          type: integer
+        averageScore:
+          type: number
+
+    QueueDepth:
+      type: object
+      properties:
+        pendingReview:
+          type: integer
+        inReview:
+          type: integer
+        disputed:
+          type: integer
+        complete:
+          type: integer
+
+    ReviewNotification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        recipientId:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+          enum: [review_assigned, assignment_expiring, assignment_expired, high_risk_flag, medium_risk_flag, deanonymization_requested, deanonymization_resolved, dispute_detected, review_complete, weekly_summary]
+        title:
+          type: string
+        body:
+          type: string
+        data:
+          type: object
+        readAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    ReviewConfiguration:
+      type: object
+      properties:
+        id:
+          type: integer
+        minReviews:
+          type: integer
+        maxReviews:
+          type: integer
+        criteriaThreshold:
+          type: integer
+        autoFlagThreshold:
+          type: integer
+        varianceLimit:
+          type: number
+        timeoutHours:
+          type: integer
+        highRiskSlaHours:
+          type: integer
+        mediumRiskSlaHours:
+          type: integer
+        deanonymizationAccessHours:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+          format: uuid
+
+    UpdateReviewConfigInput:
+      type: object
+      properties:
+        minReviews:
+          type: integer
+          minimum: 1
+        maxReviews:
+          type: integer
+          minimum: 1
+        criteriaThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        autoFlagThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        varianceLimit:
+          type: number
+          minimum: 0
+        timeoutHours:
+          type: integer
+          minimum: 1
+        highRiskSlaHours:
+          type: integer
+          minimum: 1
+        mediumRiskSlaHours:
+          type: integer
+          minimum: 1
+        deanonymizationAccessHours:
+          type: integer
+          minimum: 1
+
+    ReportMetadata:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [daily_summary, weekly_performance, monthly_quality, escalation_report]
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        generatedAt:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

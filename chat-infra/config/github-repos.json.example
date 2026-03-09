@@ -1,0 +1,53 @@
+{
+  "organization": "MentalHelpGlobal",
+  "branch_protection_defaults": {
+    "require_pr": true,
+    "required_approvals": 1,
+    "dismiss_stale_reviews": true,
+    "require_status_checks": true,
+    "enforce_admins": true,
+    "allow_force_push": false,
+    "allow_deletions": false,
+    "required_conversation_resolution": true
+  },
+  "repositories": [
+    {
+      "name": "chat-backend",
+      "has_deployments": true,
+      "environments": ["dev", "prod"],
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "chat-frontend",
+      "has_deployments": true,
+      "environments": ["dev", "prod"],
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "chat-types",
+      "has_deployments": false,
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "chat-ui",
+      "has_deployments": true,
+      "environments": ["dev", "prod"],
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "chat-ci",
+      "has_deployments": false,
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "chat-infra",
+      "has_deployments": false,
+      "branch_protection": ["develop", "main"]
+    },
+    {
+      "name": "client-spec",
+      "has_deployments": false,
+      "branch_protection": ["develop", "main"]
+    }
+  ]
+}

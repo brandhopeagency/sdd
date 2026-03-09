@@ -1,0 +1,73 @@
+name: Publish & Dispatch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'tsconfig.json'
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    name: Build & Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to GitHub Packages
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+
+          # Make publish idempotent: avoid failing CI on 409 Conflict when the
+          # version already exists (e.g., manual publish or rerun).
+          if npm view "@mentalhelpglobal/chat-types@${VERSION}" version --registry https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "Version @mentalhelpglobal/chat-types@${VERSION} already published; skipping npm publish."
+          else
+            npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "### Published @mentalhelpglobal/chat-types@${VERSION} :package:" >> $GITHUB_STEP_SUMMARY
+
+  dispatch-downstream:
+    name: Notify downstream repos
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    if: success()
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - MentalHelpGlobal/chat-backend
+          - MentalHelpGlobal/chat-frontend
+          - MentalHelpGlobal/chat-frontend-common
+          - MentalHelpGlobal/workbench-frontend
+    steps:
+      - name: Dispatch to ${{ matrix.repo }}
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: chat-types-updated
+          client-payload: '{"sha": "${{ github.sha }}"}'

@@ -1,0 +1,224 @@
+name: Test (Cloud Run Jobs)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GCP_REGION: europe-west1
+  TEST_ARTIFACT_REGISTRY: chat-backend
+  FE_JOB_NAME: fe-tests
+  BE_JOB_NAME: be-tests
+
+jobs:
+  fe-unit:
+    name: FE unit tests (Cloud Run)
+    runs-on: ubuntu-latest
+    if: >
+      ${{
+        github.event_name != 'pull_request' ||
+        !(github.base_ref == 'main' && github.head_ref == 'develop')
+      }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build FE test image (Docker)
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.TEST_ARTIFACT_REGISTRY }}/${{ env.FE_JOB_NAME }}:${{ github.sha }}
+        run: |
+          docker build -f Dockerfile.test.fe -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "FE_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy Cloud Run Job (FE)
+        run: |
+          gcloud run jobs deploy ${{ env.FE_JOB_NAME }} \
+            --image="${{ env.FE_IMAGE }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --max-retries=0 \
+            --tasks=1 \
+            --task-timeout=600 \
+            --cpu=2 --memory=2Gi \
+            --set-env-vars=NODE_ENV=test
+
+      - name: Execute Cloud Run Job (FE)
+        run: |
+          set -euo pipefail
+          EXECUTION=$(gcloud run jobs execute ${{ env.FE_JOB_NAME }} \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(name)')
+
+          echo "Execution: $EXECUTION"
+
+          for i in {1..30}; do
+            STATE=$(gcloud run jobs executions describe "$EXECUTION" \
+              --project="${{ vars.GCP_PROJECT_ID }}" \
+              --region="${{ env.GCP_REGION }}" \
+              --format="value(status.conditions[?type='Completed'].status)")
+
+            if [ "$STATE" = "True" ] || [ "$STATE" = "False" ]; then
+              break
+            fi
+
+            sleep 5
+          done
+
+          SUCCEEDED=$(gcloud run jobs executions describe "$EXECUTION" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(status.succeededCount)')
+
+          FAILED=$(gcloud run jobs executions describe "$EXECUTION" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(status.failedCount)')
+
+          echo "Final condition: ${STATE:-unset} (succeeded=${SUCCEEDED:-0}, failed=${FAILED:-0})"
+          if [ "${SUCCEEDED:-0}" = "0" ] || [ -z "${SUCCEEDED:-}" ] || [ "${FAILED:-0}" != "0" ]; then
+            gcloud run jobs executions describe "$EXECUTION" \
+              --project="${{ vars.GCP_PROJECT_ID }}" \
+              --region="${{ env.GCP_REGION }}" \
+              --format='yaml'
+            exit 1
+          fi
+
+      - name: Fetch Cloud Run logs (FE)
+        if: always()
+        run: |
+          gcloud logging read "resource.type=cloud_run_job AND labels.job_name=${{ env.FE_JOB_NAME }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --limit=200 \
+            --format=json || true
+
+  be-unit:
+    name: BE unit tests (Cloud Run)
+    runs-on: ubuntu-latest
+    if: >
+      ${{
+        github.event_name != 'pull_request' ||
+        !(github.base_ref == 'main' && github.head_ref == 'develop')
+      }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build BE test image (Docker)
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.TEST_ARTIFACT_REGISTRY }}/${{ env.BE_JOB_NAME }}:${{ github.sha }}
+        run: |
+          docker build -f server/Dockerfile.test -t "$IMAGE" server
+          docker push "$IMAGE"
+          echo "BE_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy Cloud Run Job (BE)
+        run: |
+          gcloud run jobs deploy ${{ env.BE_JOB_NAME }} \
+            --image="${{ env.BE_IMAGE }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --max-retries=0 \
+            --tasks=1 \
+            --task-timeout=600 \
+            --cpu=2 --memory=2Gi \
+            --set-env-vars=NODE_ENV=test
+
+      - name: Execute Cloud Run Job (BE)
+        run: |
+          set -euo pipefail
+          EXECUTION=$(gcloud run jobs execute ${{ env.BE_JOB_NAME }} \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(name)')
+
+          echo "Execution: $EXECUTION"
+
+          for i in {1..30}; do
+            STATE=$(gcloud run jobs executions describe "$EXECUTION" \
+              --project="${{ vars.GCP_PROJECT_ID }}" \
+              --region="${{ env.GCP_REGION }}" \
+              --format="value(status.conditions[?type='Completed'].status)")
+
+            if [ "$STATE" = "True" ] || [ "$STATE" = "False" ]; then
+              break
+            fi
+
+            sleep 5
+          done
+
+          SUCCEEDED=$(gcloud run jobs executions describe "$EXECUTION" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(status.succeededCount)')
+
+          FAILED=$(gcloud run jobs executions describe "$EXECUTION" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ env.GCP_REGION }}" \
+            --format='value(status.failedCount)')
+
+          echo "Final condition: ${STATE:-unset} (succeeded=${SUCCEEDED:-0}, failed=${FAILED:-0})"
+          if [ "${SUCCEEDED:-0}" = "0" ] || [ -z "${SUCCEEDED:-}" ] || [ "${FAILED:-0}" != "0" ]; then
+            gcloud run jobs executions describe "$EXECUTION" \
+              --project="${{ vars.GCP_PROJECT_ID }}" \
+              --region="${{ env.GCP_REGION }}" \
+              --format='yaml'
+            exit 1
+          fi
+
+      - name: Fetch Cloud Run logs (BE)
+        if: always()
+        run: |
+          gcloud logging read "resource.type=cloud_run_job AND labels.job_name=${{ env.BE_JOB_NAME }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --limit=200 \
+            --format=json || true
+

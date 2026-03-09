@@ -1,0 +1,1302 @@
+{
+  "app": {
+    "name": "Mental Health Support",
+    "tagline": "A safe space to talk",
+    "description": "Connect with our AI assistant for compassionate, judgment-free support whenever you need it."
+  },
+  "welcome": {
+    "startConversation": "Start a Conversation",
+    "signInToStart": "Sign In to Start",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "signedInAs": "Signed in as {{name}}",
+    "privacyNote": "Your conversations are private and confidential.",
+    "features": {
+      "private": "Private & Secure",
+      "compassionate": "Compassionate",
+      "available": "Available 24/7"
+    },
+    "footer": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "crisis": "Crisis Resources"
+    }
+  },
+  "pending": {
+    "title": "Approval required",
+    "subtitle": "Your account is pending approval by an administrator.",
+    "signedInAs": "Signed in as {{email}}",
+    "backToHome": "Back to home"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue",
+    "email": "Email",
+    "password": "Password",
+    "signInButton": "Sign In",
+    "signingIn": "Signing in...",
+    "invalidCredentials": "Invalid email or password.",
+    "back": "Back",
+    "otp": {
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "We'll send you a one-time code to sign in",
+      "invitationLabel": "Invitation Code (optional)",
+      "invitationPlaceholder": "Enter invitation code",
+      "invitationHint": "Use a code to apply directly to a group",
+      "sendCode": "Send Code",
+      "sending": "Sending...",
+      "codeLabel": "Verification Code",
+      "codeHint": "Enter the 6-digit code from your email",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "changeEmail": "Change email",
+      "codeSent": "Code sent to",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidCode": "Please enter a 6-digit code",
+      "invalid_otp": "Invalid code. Please try again.",
+      "otp_expired": "Code expired. Please request a new one.",
+      "account_pending_approval": "Your account is awaiting approval.",
+      "account_disapproved": "Your account was disapproved.",
+      "disapproved_cooling_off": "Account disapproved. Please re-apply after the cooloff period.",
+      "invalid_invitation_code": "Invitation code must be alphanumeric.",
+      "invitation_code_not_found": "Invitation code not found.",
+      "guest_disabled": "Guest mode is disabled.",
+      "otp_disabled_workbench": "Email login is not available for this application.",
+      "google_login_failed": "Google sign-in failed. Please try again."
+    },
+    "google": {
+      "error": "Google sign-in failed. Please try again.",
+      "noCredential": "No credential received from Google."
+    },
+    "divider": "or",
+    "noMethodsAvailable": "No login methods are currently available."
+  },
+  "chat": {
+    "header": {
+      "title": "Mental Health Assistant",
+      "subtitle": "Here to support you"
+    },
+    "input": {
+      "placeholder": "Type your message...",
+      "send": "Send",
+      "debugTip": "Tip: Type /debug:enable for debug mode"
+    },
+    "session": {
+      "end": "End Chat",
+      "new": "New Session",
+      "starting": "Starting session..."
+    },
+    "memory": {
+      "updating": "Updating memory in background…"
+    },
+    "memoryCollapsedHint": "{{count}} blocks",
+    "messages": {
+      "assistant": "Assistant",
+      "you": "You",
+      "helpful": "Helpful",
+      "notHelpful": "Not helpful",
+      "giveFeedback": "Give detailed feedback",
+      "feedbackSubmitted": "Feedback submitted",
+      "thanks": "Thanks!"
+    },
+    "debug": {
+      "title": "Debug Mode",
+      "info": "Debug Info",
+      "intent": "Intent",
+      "confidence": "Confidence",
+      "responseTime": "Response Time",
+      "parameters": "Parameters",
+      "systemPrompts": "System prompts",
+      "summarizationPrompt": "Summarization / search prompt",
+      "searchResultsUsedInMainPrompt": "Search results used in main prompt",
+      "userMemory": "User memory",
+      "loading": "Loading…",
+      "loadFailed": "Failed to load",
+      "memoryEmpty": "Memory is empty or not created yet for this user"
+    },
+    "guest": "Guest",
+    "register": "Register",
+    "registerPopup": {
+      "title": "Register",
+      "subtitle": "Save your chat",
+      "chatPreserved": "Your current conversation will be saved to your account"
+    }
+  },
+  "feedback": {
+    "title": "Provide Feedback",
+    "question": "How helpful was this response?",
+    "selectRating": "Select a rating",
+    "ratings": {
+      "poor": "Poor",
+      "fair": "Fair",
+      "good": "Good",
+      "great": "Great",
+      "excellent": "Excellent"
+    },
+    "comment": "Additional comments (optional)",
+    "commentPlaceholder": "Tell us more about your experience...",
+    "cancel": "Cancel",
+    "submit": "Submit Feedback"
+  },
+  "workbench": {
+    "title": "Workbench",
+    "subtitle": "Admin Panel",
+    "scopeSelector": {
+      "label": "Space",
+      "ariaLabel": "Select space",
+      "global": "Global",
+      "placeholder": "Select a space"
+    },
+    "groupSelector": {
+      "label": "Group",
+      "ariaLabel": "Select group"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "groupDashboard": "Group Dashboard",
+      "groupUsers": "Group Users",
+      "groupChats": "Group Chats",
+      "groupSection": "Group resources",
+      "users": "User Management",
+      "groups": "Group management",
+      "approvals": "Approvals",
+      "research": "Research & Moderation",
+      "privacy": "Privacy Controls",
+      "reviewReports": "Reports & Analytics",
+      "tagManagement": "Tag Management",
+      "surveySchemas": "Survey Schemas",
+      "surveyInstances": "Survey Instances",
+      "settings": "Settings",
+      "backToChat": "Back to Chat"
+    },
+    "groupSelector": {
+      "label": "Active group"
+    },
+    "pii": {
+      "masked": "Masked",
+      "visible": "Visible",
+      "label": "PII",
+      "safeForSharing": "Safe for screen sharing"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "stats": {
+      "activeUsers": "Active Users",
+      "pendingApprovals": "Pending approvals",
+      "blockedUsers": "Blocked Users",
+      "pendingReview": "Pending Review",
+      "activeSessions": "Active Sessions",
+      "thisWeek": "+12% this week",
+      "requiresAttention": "Requires attention",
+      "awaitingApproval": "Awaiting review",
+      "awaitingModeration": "Sessions awaiting moderation",
+      "inProgress": "Currently in progress"
+    },
+    "recentSessions": "Recent Sessions",
+    "recentUsers": "Recent Users",
+    "messages": "messages",
+    "moderationProgress": "Moderation Progress",
+    "reviewed": "reviewed"
+  },
+  "group": {
+    "dashboard": {
+      "title": "Group Dashboard",
+      "welcome": "Welcome",
+      "groupLabel": "Group",
+      "unknownGroup": "Unknown",
+      "noGroup": "Select a group to view the dashboard",
+      "stats": {
+        "groupUsers": "Group users",
+        "activeUsers": "Active",
+        "blockedUsers": "Blocked users",
+        "sessionsTotal": "Sessions",
+        "activeSessions": "Active sessions",
+        "pendingReview": "Pending review"
+      },
+      "quickActions": {
+        "title": "Quick actions",
+        "subtitle": "Common group admin tasks",
+        "manageUsers": "Manage group users",
+        "viewChats": "View anonymized chats"
+      },
+      "security": {
+        "title": "Security boundary",
+        "notice": "You can only view and manage users and chats within your assigned group. Chats are always shown in anonymized form."
+      }
+    },
+    "users": {
+      "title": "Group Users",
+      "subtitle": "View and manage users in your group",
+      "invites": {
+        "title": "Invite codes",
+        "subtitle": "Generate an invite code for users to request access to this group",
+        "generate": "Generate invite code",
+        "copy": "Copy",
+        "copied": "Copied"
+      },
+      "requests": {
+        "title": "Join requests",
+        "subtitle": "Approve or reject users requesting access to this group",
+        "empty": "No pending requests",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "noGroup": "Select a group to view users",
+      "search": "Search by name or email...",
+      "addByEmail": "Add user by email",
+      "add": "Add to group",
+      "remove": "Remove",
+      "readOnly": "Read-only"
+    },
+    "sessions": {
+      "title": "Group Chats",
+      "subtitle": "Anonymized chat sessions scoped to your group",
+      "noGroup": "Select a group to view sessions",
+      "search": "Search by session ID...",
+      "emptyConversation": "No messages in this session yet",
+      "back": "Back to sessions"
+    }
+  },
+  "groups": {
+    "title": "Groups",
+    "subtitle": "Create and manage user groups",
+    "refresh": "Refresh",
+    "list": "All groups",
+    "create": "Create group",
+    "createPlaceholder": "New group name",
+    "details": "Group details",
+    "rename": "Rename",
+    "members": "Members",
+    "addMember": "Add member",
+    "addMemberPlaceholder": "user@example.com",
+    "memberRole": "Member",
+    "adminRole": "Admin",
+    "removeMember": "Remove member",
+    "noMembers": "No members found",
+    "invites": "Invitation codes",
+    "inviteCodePlaceholder": "INVITE123",
+    "createInvite": "Create invite",
+    "inviteExpires": "Expires {{date}}",
+    "inviteNoExpiry": "No expiry",
+    "inviteInactive": "Inactive",
+    "deactivateInvite": "Deactivate",
+    "noInvites": "No invitation codes",
+    "noGroupSelected": "Select a group to manage",
+    "requiresApproval": "Requires approval",
+    "autoAdmit": "Auto-admit",
+    "requiresApprovalToggle": "Require approval to join"
+  },
+  "approvals": {
+    "title": "Approvals",
+    "subtitle": "Approve or reject new access requests",
+    "refresh": "Refresh",
+    "empty": "No pending approvals",
+    "noGroup": "Select a group to view approvals",
+    "emptyHint": "Approvals appear when users request access.",
+    "emptyCta": "Open user management",
+    "commentLabel": "Approval comment (required for disapprove)",
+    "commentPlaceholder": "Add a note for the requester",
+    "commentRequired": "Comment is required to disapprove",
+    "approve": "Approve",
+    "disapprove": "Disapprove"
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage user accounts and permissions",
+    "search": "Search by name or email...",
+    "filters": {
+      "allRoles": "All Roles",
+      "allStatus": "All Status",
+      "active": "Active",
+      "blocked": "Blocked",
+      "pending": "Pending",
+      "approval": "Awaiting Approval",
+      "disapproved": "Disapproved",
+      "anonymized": "Anonymized",
+      "testUsersOnly": "Test users only"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastActive": "Last Active",
+      "actions": "Actions",
+      "view": "View",
+      "never": "Never",
+      "testUserBadge": "Test user"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "users": "users",
+      "page": "Page"
+    },
+    "empty": "No users found",
+    "sort": {
+      "ariaLabel": "Sort users",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "nameAsc": "Name (A→Z)",
+      "emailAsc": "Email (A→Z)",
+      "lastActive": "Last active (newest)",
+      "mostSessions": "Most sessions"
+    },
+    "pageSize": {
+      "ariaLabel": "Users per page"
+    },
+    "createUser": {
+      "title": "Create User",
+      "subtitle": "Add a new user to the system",
+      "button": "Add User",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "User name",
+      "role": "Role",
+      "status": "Status",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": "User created successfully",
+      "error": {
+        "emailRequired": "Email is required",
+        "displayNameRequired": "Display name is required",
+        "invalidEmail": "Invalid email format",
+        "emailExists": "A user with this email already exists",
+        "generic": "Failed to create user"
+      }
+    }
+  },
+  "userProfile": {
+    "backToList": "Back to User List",
+    "accountInfo": "Account Information",
+    "created": "Created",
+    "lastLogin": "Last Login",
+    "totalSessions": "Total Sessions",
+    "userId": "User ID",
+    "adminActions": "Administrative Actions",
+    "blockUser": "Block User",
+    "unblockUser": "Unblock User",
+    "changeRole": "Change Role",
+    "gdpr": {
+      "title": "GDPR Data Rights",
+      "description": "These actions support GDPR compliance for data portability and erasure.",
+      "downloadArchive": "Download Archive",
+      "executeErasure": "Execute Erasure",
+      "exportRequested": "Export requested. Job ID:",
+      "exportReady": "You will receive an email when the export is ready for download."
+    },
+    "erasure": {
+      "confirmTitle": "Confirm Data Erasure",
+      "cannotUndo": "This action cannot be undone",
+      "warning": "This will permanently anonymize all personal data for",
+      "reason": "Reason for erasure (required)",
+      "reasonPlaceholder": "Enter the reason for this data erasure request...",
+      "cancel": "Cancel",
+      "execute": "Execute Erasure"
+    },
+    "anonymized": {
+      "title": "Anonymized Account",
+      "description": "This user's data has been anonymized per GDPR erasure request. Personal information has been removed and cannot be recovered."
+    }
+  },
+  "research": {
+    "title": "Research & Moderation",
+    "subtitle": "Review and annotate chat sessions",
+    "search": "Search by session ID or user...",
+    "filters": {
+      "allStatus": "All Status",
+      "pending": "Pending",
+      "inReview": "In Review",
+      "moderated": "Moderated"
+    },
+    "session": {
+      "user": "User",
+      "anonymous": "Anonymous",
+      "messages": "messages",
+      "total": "sessions total",
+      "pendingReview": "pending review"
+    }
+  },
+  "moderation": {
+    "backToSessions": "Back",
+    "columns": {
+      "transcript": "Transcript",
+      "goldenReference": "Golden Reference",
+      "annotation": "Annotation"
+    },
+    "transcript": {
+      "messages": "messages"
+    },
+    "golden": {
+      "title": "Golden Reference",
+      "subtitle": "Ideal responses for training",
+      "placeholder": "Enter the ideal response for this message...",
+      "rlhfNote": "This will be used as training data for RLHF.",
+      "selectMessage": "Select a message from the transcript to add a golden reference",
+      "previous": "Previous Annotations",
+      "rating": "Rating"
+    },
+    "annotation": {
+      "title": "Annotation",
+      "subtitle": "Rate and tag this session",
+      "qualityRating": "Quality Rating",
+      "ratings": {
+        "poor": "Poor",
+        "fair": "Fair",
+        "good": "Good",
+        "veryGood": "Very Good",
+        "excellent": "Excellent"
+      },
+      "notes": "Notes",
+      "notesPlaceholder": "Add your observations and notes...",
+      "messageTags": "Message Tags",
+      "save": "Save Annotation",
+      "markComplete": "Mark as Complete"
+    },
+    "tags": {
+      "addTag": "Add Tag",
+      "sessionTags": "Session Tags",
+      "customTag": "Custom tag..."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Controls",
+    "subtitle": "GDPR compliance and data protection management",
+    "piiProtection": {
+      "title": "PII Protection",
+      "masked": "Personal data is masked for safe viewing",
+      "visible": "Personal data is currently visible"
+    },
+    "dataRequests": {
+      "title": "Data Requests",
+      "subtitle": "Active export and access requests",
+      "pending": "Pending"
+    },
+    "anonymizedRecords": {
+      "title": "Anonymized Records",
+      "subtitle": "users anonymized"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "bulkExport": "Bulk Export",
+      "bulkExportDesc": "Export all user data for audit",
+      "generateReport": "Generate Report",
+      "generateReportDesc": "Create GDPR compliance report",
+      "dataRetention": "Data Retention",
+      "dataRetentionDesc": "Review retention policies"
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "search": "Search logs...",
+      "columns": {
+        "action": "Action",
+        "targetUser": "Target User",
+        "performedBy": "Performed By",
+        "date": "Date",
+        "status": "Status"
+      },
+      "actions": {
+        "dataExport": "Data Export",
+        "dataErasure": "Data Erasure",
+        "piiAccess": "PII Access"
+      },
+      "status": {
+        "completed": "Completed",
+        "pending": "Pending"
+      }
+    },
+    "gdprCompliance": {
+      "title": "GDPR Compliance Status",
+      "description": "This system supports Article 15 (Right of Access), Article 17 (Right to Erasure), and Article 20 (Right to Data Portability). All data processing activities are logged for audit purposes."
+    }
+  },
+  "review": {
+    "common": {
+      "back": "Back",
+      "cancel": "Cancel",
+      "close": "Close",
+      "confirm": "Confirm",
+      "error": "Error",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "save": "Save",
+      "saving": "Saving...",
+      "retry": "Retry"
+    },
+    "config": {
+      "title": "Review Configuration",
+      "lastUpdated": "Last updated by {{user}} on {{date}}",
+      "minReviews": "Minimum Reviews",
+      "minReviewsDesc": "Minimum number of reviews required per session",
+      "maxReviews": "Maximum Reviews",
+      "maxReviewsDesc": "Maximum number of reviews allowed per session",
+      "criteriaThreshold": "Criteria Threshold",
+      "criteriaThresholdDesc": "Score at or below which criteria feedback is required",
+      "autoFlagThreshold": "Auto-Flag Threshold",
+      "autoFlagThresholdDesc": "Score at or below which sessions are automatically flagged",
+      "varianceLimit": "Variance Limit",
+      "varianceLimitDesc": "Maximum allowed score deviation between reviewers",
+      "timeoutHours": "Timeout (hours)",
+      "timeoutHoursDesc": "Hours before an in-progress review times out",
+      "highRiskSlaHours": "High Risk SLA (hours)",
+      "highRiskSlaHoursDesc": "SLA deadline for high risk flags in hours",
+      "mediumRiskSlaHours": "Medium Risk SLA (hours)",
+      "mediumRiskSlaHoursDesc": "SLA deadline for medium risk flags in hours",
+      "deanonymizationAccessHours": "Deanonymization Access (hours)",
+      "deanonymizationAccessHoursDesc": "Hours of access after deanonymization is approved",
+      "minMessageThreshold": "Min Message Threshold",
+      "minMessageThresholdDesc": "Sessions with fewer messages are auto-tagged as short",
+      "save": "Save Configuration",
+      "saved": "Configuration saved",
+      "unknownUser": "Unknown user",
+      "validation": {
+        "range": "Value must be between {{min}} and {{max}}",
+        "maxReviewsGteMin": "Maximum reviews must be greater than or equal to minimum",
+        "varianceRange": "Variance must be between 0 and max score"
+      }
+    },
+    "criteriaFeedback": {
+      "title": "Criteria Feedback",
+      "required": "Required",
+      "checkboxHint": "Select the criteria that apply for scores ≤ {{threshold}}. Optional detail text can be added.",
+      "optionalDetail": "Add optional detail (not required)...",
+      "selectAtLeastOne": "Please select at least one criterion."
+    },
+    "criteria": {
+      "relevance": { "name": "Relevance", "description": "How well the response addresses the user's concern" },
+      "empathy": { "name": "Empathy", "description": "Degree of compassion and emotional attunement" },
+      "safety": { "name": "Safety", "description": "Whether the response maintains user safety" },
+      "ethics": { "name": "Ethics", "description": "Adherence to ethical guidelines and boundaries" },
+      "clarity": { "name": "Clarity", "description": "How clear and understandable the response is" }
+    },
+    "escalation": {
+      "title": "Escalations",
+      "empty": "No open escalations",
+      "overdueSla": "{{count}} overdue SLA",
+      "acknowledge": "Acknowledge",
+      "resolve": "Resolve",
+      "escalate": "Escalate",
+      "requestDeanonymization": "Request Deanonymization",
+      "submitDeanonymization": "Submit Request",
+      "resolutionNotes": "Resolution notes..."
+    },
+    "flag": {
+      "title": "Risk Flag",
+      "severity": "Severity",
+      "severityRequired": "Severity is required",
+      "reason": "Reason Category",
+      "reasonRequired": "Reason category is required",
+      "details": "Details",
+      "detailsMin": "Minimum 10 characters required",
+      "requestDeanonymization": "Request deanonymization",
+      "deanonymizationJustification": "Justification for deanonymization...",
+      "submit": "Submit Flag",
+      "autoDetected": "Auto-detected",
+      "notificationDelivered": "Flag created — notifications delivered",
+      "notificationPending": "Flag created — notification delivery pending",
+      "notificationFailed": "Flag created — notification delivery failed",
+      "severityOptions": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "reasonOptions": {
+        "crisis_indicators": "Crisis Indicators",
+        "self_harm_language": "Self-Harm Language",
+        "inappropriate_ai_response": "Inappropriate AI Response",
+        "ethical_concern": "Ethical Concern",
+        "other_safety_concern": "Other Safety Concern"
+      }
+    },
+    "queue": {
+      "title": "Review Queue",
+      "subtitle": "Review and rate chat sessions",
+      "tabsAriaLabel": "Review queue tabs",
+      "tabs": {
+        "pending": "Pending",
+        "flagged": "Flagged",
+        "in_progress": "In Progress",
+        "completed": "Completed"
+      },
+      "scope": {
+        "label": "Scope",
+        "allSpaces": "All Spaces",
+        "selectedSpace": "Current Space",
+        "selectedSpaceUnavailable": "Space unavailable",
+        "loadingSpaces": "Loading spaces..."
+      },
+      "filters": {
+        "toggle": "Filters",
+        "riskLevel": "Risk Level",
+        "allRiskLevels": "All Risk Levels",
+        "language": "Language",
+        "allLanguages": "All Languages",
+        "languageEn": "English",
+        "languageUk": "Ukrainian",
+        "languageRu": "Russian",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "sortBy": "Sort By",
+        "sortPriority": "Priority",
+        "sortOldest": "Oldest First",
+        "sortNewest": "Newest First",
+        "assignedToMe": "Assigned to me",
+        "clearAll": "Clear all"
+      },
+      "assign": {
+        "title": "Assign Reviewer",
+        "placeholder": "Select a reviewer...",
+        "confirm": "Assign",
+        "cancel": "Cancel"
+      },
+      "empty": {
+        "title": "No sessions to review",
+        "description": "There are no sessions matching the current filters."
+      },
+      "error": {
+        "title": "Failed to load review queue",
+        "retry": "Retry"
+      },
+      "pagination": {
+        "ariaLabel": "Pagination",
+        "previous": "Previous",
+        "next": "Next",
+        "pageInfo": "Page {{current}} of {{total}}",
+        "showing": "Showing {{start}}-{{end}} of {{total}}"
+      }
+    },
+    "ratingPanel": {
+      "title": "Your Rating",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Add your review comments...",
+      "commentAriaLabel": "Review comment",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "autoSaveHint": "Ratings are auto-saved",
+      "saveError": "Failed to save. Please retry."
+    },
+    "riskLevels": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "None"
+    },
+    "score": {
+      "labels": {
+        "1": "Unacceptable",
+        "2": "Very Poor",
+        "3": "Poor",
+        "4": "Below Average",
+        "5": "Average",
+        "6": "Above Average",
+        "7": "Good",
+        "8": "Very Good",
+        "9": "Excellent",
+        "10": "Outstanding"
+      }
+    },
+    "scoreSelector": {
+      "label": "Score",
+      "ariaLabel": "Select a score from 1 to 10",
+      "buttonAriaLabel": "Score {{score}}"
+    },
+    "session": {
+      "title": "Review Session",
+      "loading": "Loading session...",
+      "transcript": "Transcript",
+      "roleAssistant": "Assistant",
+      "roleUser": "User",
+      "assistantMessageAriaLabel": "Rate this assistant message",
+      "rateMessage": "Rate this message",
+      "rateAll": "Rate all messages",
+      "rated": "Rated",
+      "noMessagesTitle": "No messages",
+      "noMessagesDescription": "This session has no messages to review.",
+      "submitReview": "Submit Review",
+      "submitting": "Submitting...",
+      "submitted": "Review submitted",
+      "complete": "Complete",
+      "blinded": "Blinded",
+      "tiebreaker": "Tiebreaker",
+      "disputed": "Disputed",
+      "disputedClosed": "Dispute Closed",
+      "flags": "Flags",
+      "reviewCount": "{{count}} reviews",
+      "allReviews": "All Reviews",
+      "aggregateScore": "Aggregate Score",
+      "scoreRange": "{{min}} – {{max}}"
+    },
+    "sessionCard": {
+      "ariaLabel": "Review session card",
+      "messageCount": "{{count}} messages",
+      "riskLevel": "Risk: {{level}}",
+      "reviewProgress": "{{completed}} / {{required}} reviews",
+      "progressAriaLabel": "Review progress",
+      "assignedTo": "Assigned",
+      "assign": "Assign",
+      "autoFlagged": "Auto-flagged",
+      "expired": "Expired",
+      "expiresIn": "Expires in {{hours}}h {{minutes}}m",
+      "expiresInMinutes": "Expires in {{minutes}} min"
+    },
+    "tags": {
+      "title": "Tags",
+      "tagManagement": "Tag Management",
+      "createNew": "Create New Tag",
+      "tagName": "Tag Name",
+      "tagLabel": "Label",
+      "tagDescription": "Description",
+      "category": "Category",
+      "categoryChat": "Chat tag",
+      "categoryUser": "User tag",
+      "excludeFromReviews": "Excludes from reviews",
+      "active": "Active",
+      "inactive": "Inactive",
+      "editTag": "Edit",
+      "deleteTag": "Delete",
+      "confirmDelete": "Delete Tag",
+      "confirmDeleteDescription": "Are you sure you want to delete this tag? This action cannot be undone.",
+      "duplicateError": "A tag with this name already exists",
+      "noTags": "No tags found",
+      "addTag": "Add tag...",
+      "assignTag": "Assign tag",
+      "loadError": "Failed to load tags",
+      "filter": "Filter by tag",
+      "excluded": "Excluded",
+      "excludedSessions": "Excluded sessions",
+      "exclusionReason": "Exclusion reason"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "progress": {
+      "rated": "{{rated}} of {{total}} rated",
+      "readyToSubmit": "Ready to submit",
+      "notReady": "Rate all messages to submit",
+      "ariaLabel": "{{rated}} of {{total}} messages rated"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications",
+      "banners": {
+        "escalations": "{{count}} escalations require attention",
+        "deanonymizations": "{{count}} deanonymization requests pending",
+        "overdue": "{{count}} overdue reviews"
+      }
+    },
+    "deanonymization": {
+      "title": "Deanonymization",
+      "request": "Request Deanonymization",
+      "submitted": "Request submitted",
+      "category": "Justification Category",
+      "details": "Details",
+      "detailsMin": "Minimum 10 characters required",
+      "submit": "Submit Request",
+      "pending": "Pending",
+      "approved": "Approved",
+      "denied": "Denied",
+      "accessExpired": "Access Expired",
+      "accessExpires": "Expires in {{time}}",
+      "revealError": "Failed to reveal identity",
+      "revealedIdentity": "Reveal Identity",
+      "approveConfirm": "Approve Deanonymization?",
+      "approveConfirmDetail": "This will grant temporary access to personally identifiable information.",
+      "approve": "Approve",
+      "deny": "Deny",
+      "denialNotes": "Denial notes...",
+      "fieldName": "Name",
+      "fieldEmail": "Email",
+      "welfareCheck": "Welfare Check",
+      "legalRequirement": "Legal Requirement",
+      "clinicalEscalation": "Clinical Escalation",
+      "investigation": "Investigation",
+      "justification": "Justification Details",
+      "justificationPlaceholder": "Explain why deanonymization is needed (min 10 characters)..."
+    },
+    "dashboard": {
+      "title": "My Dashboard",
+      "teamTitle": "Team Dashboard",
+      "noData": "No data available",
+      "scoreDistribution": "Score Distribution",
+      "criteriaBreakdown": "Criteria Breakdown",
+      "weeklyTrend": "Weekly Trend",
+      "queueDepth": "Queue Depth",
+      "stats": {
+        "reviewsCompleted": "Reviews Completed",
+        "averageScore": "Average Score",
+        "agreementRate": "Agreement Rate",
+        "totalReviews": "Total Reviews",
+        "teamAverage": "Team Average",
+        "interRaterReliability": "Inter-rater Reliability",
+        "pendingEscalations": "Pending Escalations",
+        "pendingDeanonymizations": "Pending Deanonymizations"
+      },
+      "workload": {
+        "title": "Reviewer Workload",
+        "reviewer": "Reviewer",
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "average": "Average"
+      }
+    },
+    "reports": {
+      "title": "Reports & Analytics",
+      "type": "Report Type",
+      "reportType": "Report Type",
+      "from": "From",
+      "dateFrom": "From",
+      "to": "To",
+      "dateTo": "To",
+      "format": "Format",
+      "generating": "Generating...",
+      "generate": "Generate Report",
+      "preview": "Result",
+      "downloaded": "Report downloaded:"
+    },
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "description": "An error occurred in the review module. Please try again.",
+      "retry": "Try Again"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences",
+    "showTechnicalDetails": "Show Technical Details",
+    "profile": {
+      "title": "Profile"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "piiMasking": "PII Masking",
+      "piiMaskingDesc": "Hide personal information in the Workbench"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "emailDesc": "Receive updates via email",
+      "browser": "Browser Notifications",
+      "browserDesc": "Show desktop notifications",
+      "digest": "Weekly Digest",
+      "digestDesc": "Summary of activity each week"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language & Region",
+      "language": "Language",
+      "timezone": "Timezone"
+    },
+    "admin": {
+      "title": "Admin Settings",
+      "subtitle": "Global controls for guest access and approvals",
+      "reload": "Reload",
+      "guestMode": "Guest Mode",
+      "guestModeDesc": "Allow unauthenticated users to start a chat",
+      "cooloffDays": "Approval Cooloff (days)",
+      "cooloffDaysDesc": "Days before a disapproved user can re-apply",
+      "otpDisable": "Disable OTP Login for Workbench",
+      "otpDisableDesc": "When enabled, workbench users can only sign in with Google. Email OTP login will be hidden.",
+      "save": "Save Admin Settings"
+    },
+    "save": "Save Changes"
+  },
+  "roles": {
+    "user": "User",
+    "qa_specialist": "QA Specialist",
+    "researcher": "Researcher",
+    "supervisor": "Supervisor",
+    "moderator": "Moderator",
+    "group_admin": "Group Admin",
+    "owner": "Owner"
+  },
+  "supervision": {
+    "title": "Supervisor Review",
+    "queue": "Supervision Queue",
+    "queueEmpty": "No reviews awaiting supervision",
+    "chatTranscript": "Chat Transcript",
+    "reviewerAssessment": "Reviewer Assessment",
+    "messageRatings": "Message Ratings",
+    "message": "Message",
+    "priorDecisions": "Prior Decisions",
+    "yourDecision": "Your Decision",
+    "approve": "Approve",
+    "disapprove": "Disapprove",
+    "comments": "Comments",
+    "commentsPlaceholder": "Explain your decision...",
+    "returnToReviewer": "Return to reviewer for revision",
+    "submitDecision": "Submit Decision",
+    "iteration": "Iteration",
+    "contextNotFound": "Supervision context not found",
+    "noMessages": "No messages found",
+    "reviewer": "Reviewer",
+    "submitted": "Submitted",
+    "messages": "Messages",
+    "group": "Group",
+    "awaitingFeedback": "Awaiting Feedback",
+    "awaitingEmpty": "No reviews awaiting your feedback",
+    "supervisorDecision": "Supervisor Decision",
+    "viewDetails": "View Details",
+    "tab": {
+      "transcript": "Transcript",
+      "assessment": "Assessment",
+      "decision": "Decision"
+    }
+  },
+  "gradeDescription": {
+    "title": "Grade Descriptions",
+    "editTooltip": "Edit description",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "groupConfig": {
+    "title": "Group Review Settings",
+    "reviewerCountOverride": "Reviewer Count Override",
+    "supervisionPolicy": "Supervision Policy",
+    "samplePercentage": "Sample Percentage",
+    "useGlobalDefault": "Use global default",
+    "save": "Save",
+    "reset": "Reset to Global"
+  },
+  "groupUserCreation": {
+    "checkEmail": "Check",
+    "userFound": "User found: {{name}}. Click Add to add them to the group.",
+    "notFound": "No account found — create a new user",
+    "displayName": "Display Name",
+    "namePlaceholder": "Enter full name",
+    "role": "Role",
+    "nameRequired": "Display name is required to create a new user",
+    "alreadyMember": "This user is already a member of this group",
+    "invitationSent": "User created and added to group"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "show": "Show",
+    "hide": "Hide",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "or": "or",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "signOut": "Sign Out",
+    "notFound": "Not found",
+    "saving": "Saving...",
+    "confirm": "Confirm",
+    "creating": "Creating..."
+  },
+  "survey": {
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "instanceStatus": {
+      "draft": "Scheduled",
+      "active": "Active",
+      "expired": "Expired",
+      "closed": "Closed"
+    },
+    "dataType": {
+      "group": {
+        "numeric": "Numeric",
+        "dateTime": "Date / Time",
+        "ratingScale": "Rating Scale",
+        "presets": "Text Presets",
+        "text": "Text"
+      },
+      "integerSigned": "Integer (signed)",
+      "integerUnsigned": "Integer (unsigned)",
+      "decimal": "Decimal",
+      "date": "Date",
+      "time": "Time",
+      "datetime": "Date & Time",
+      "ratingScale": "Rating Scale",
+      "email": "Email",
+      "phone": "Phone",
+      "url": "URL",
+      "postalCode": "Postal Code",
+      "alphanumericCode": "Alphanumeric Code",
+      "text": "Text (custom)"
+    },
+    "ratingScale": {
+      "startValue": "Start value",
+      "endValue": "End value",
+      "step": "Step",
+      "segmentCount": "{{count}} segments",
+      "invalidConfig": "Invalid configuration: range must be evenly divisible by step"
+    },
+    "condition": {
+      "add": "+ Add condition",
+      "remove": "Remove condition",
+      "ifLabel": "Show if",
+      "equals": "equals",
+      "notEquals": "not equals",
+      "in": "is one of",
+      "contains": "contains",
+      "selectValue": "Select value...",
+      "valuePlaceholder": "Value",
+      "dependsOn": "Depends on Q{{order}}",
+      "dependsOnShort": "Q{{order}}",
+      "addCondition": "Add condition",
+      "removeCondition": "Remove",
+      "combinator": {
+        "and": "AND",
+        "or": "OR"
+      },
+      "operator": {
+        "not_in": "is not one of"
+      },
+      "multiValue": {
+        "addValue": "Add value",
+        "placeholder": "Type and press Enter"
+      },
+      "staleRemoved": "Condition references a deleted question — removed"
+    },
+    "option": {
+      "freetextLabel": "Enable freetext input",
+      "freetextRequired": "Require freetext",
+      "freetextType": {
+        "string": "Text (string)",
+        "number": "Number"
+      }
+    },
+    "preview": {
+      "title": "Visibility Preview",
+      "show": "Preview",
+      "hide": "Hide Preview",
+      "hidden": "Hidden",
+      "reset": "Reset answers",
+      "visibleCount": "{{visible}} of {{total}} visible",
+      "button": "Preview",
+      "open": "Preview survey",
+      "exit": "Exit Preview",
+      "badge": "Preview Mode",
+      "noQuestions": "Add at least one question to preview"
+    },
+    "autosave": {
+      "saving": "Saving...",
+      "saved": "Saved",
+      "failed": "Save failed",
+      "retry": "Retry"
+    },
+    "conflict": {
+      "title": "Schema updated externally",
+      "message": "Another user has modified this schema. Reload to see their changes, or continue editing (your next save will overwrite).",
+      "reload": "Reload",
+      "continue": "Continue editing"
+    },
+    "freetext": {
+      "placeholder": "Type your answer...",
+      "placeholderNumber": "Enter a number..."
+    },
+    "export": {
+      "button": "Export"
+    },
+    "import": {
+      "button": "Import",
+      "title": "Import Survey Schema",
+      "dragDrop": "Drag and drop a JSON file here, or",
+      "importing": "Importing...",
+      "browse": "Browse files",
+      "hint": "JSON files up to 5 MB",
+      "validationFailed": "Validation failed"
+    },
+    "schemas": {
+      "title": "Survey Schemas",
+      "create": "New Schema",
+      "showArchived": "Show archived",
+      "empty": "No survey schemas yet.",
+      "clone": "Clone",
+      "archive": "Archive",
+      "restore": "Restore",
+      "createFailed": "Failed to create schema",
+      "col": {
+        "title": "Title",
+        "status": "Status",
+        "questions": "Questions",
+        "created": "Created",
+        "published": "Published",
+        "actions": "Actions"
+      }
+    },
+    "schema": {
+      "untitled": "Untitled Survey",
+      "editTitle": "Edit Schema",
+      "viewTitle": "View Schema",
+      "publish": "Publish",
+      "notFound": "Schema not found",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "questionsHeading": "Questions"
+    },
+    "publish": {
+      "confirmTitle": "Publish Schema?",
+      "confirmMessage": "Once published, the schema becomes immutable — questions and settings cannot be changed. You can clone it later to create a new editable version.",
+      "confirm": "Yes, Publish"
+    },
+    "question": {
+      "add": "Add Question",
+      "required": "Required",
+      "riskFlag": "Risk flag",
+      "minValue": "Min value",
+      "maxValue": "Max value",
+      "min": "Min",
+      "max": "Max",
+      "dataType": "Data type",
+      "textPlaceholder": "Enter question text...",
+      "options": "Options",
+      "option": "Option",
+      "addOption": "Add option",
+      "minLength": "Min length",
+      "maxLength": "Max length",
+      "regex": "Regex",
+      "type": {
+        "free_text": "Free Text",
+        "integer_signed": "Integer (signed)",
+        "integer_unsigned": "Integer (unsigned)",
+        "decimal": "Decimal",
+        "date": "Date",
+        "time": "Time",
+        "datetime": "Date & Time",
+        "email": "Email",
+        "phone": "Phone",
+        "url": "URL",
+        "postal_code": "Postal Code",
+        "alphanumeric_code": "Alphanumeric Code",
+        "rating_scale": "Rating Scale",
+        "single_choice": "Single Choice",
+        "multi_choice": "Multiple Choice",
+        "boolean": "Yes / No"
+      }
+    },
+    "questionType": {
+      "group": {
+        "numeric": "Numeric",
+        "dateTime": "Date / Time",
+        "ratingScale": "Rating Scale",
+        "presets": "Text Presets",
+        "text": "Text",
+        "selection": "Selection"
+      }
+    },
+    "instances": {
+      "title": "Survey Instances",
+      "create": "New Instance",
+      "empty": "No survey instances yet.",
+      "col": {
+        "title": "Title",
+        "status": "Status",
+        "groups": "Groups",
+        "start": "Start",
+        "expiry": "Expiry",
+        "completed": "Completed"
+      }
+    },
+    "instance": {
+      "createTitle": "Create Survey Instance",
+      "schema": "Schema",
+      "selectSchema": "Select a published schema...",
+      "groups": "Target Groups",
+      "noGroups": "No groups available",
+      "priority": "Priority",
+      "addToMemory": "Add to memory",
+      "publicHeader": "Public header",
+      "publicHeaderPlaceholder": "Custom title shown to users (optional)",
+      "showReview": "Show review step",
+      "startDate": "Start Date",
+      "expirationDate": "Expiration Date",
+      "create": "Create Instance",
+      "requiredFields": "All fields are required",
+      "expiryAfterStart": "Expiration must be after start date",
+      "createFailed": "Failed to create instance",
+      "notFound": "Instance not found",
+      "details": "Instance Details",
+      "groupCount": "group(s)",
+      "close": "Close Instance",
+      "viewResponses": "View Responses",
+      "snapshot": "Schema Snapshot"
+    },
+    "responses": {
+      "title": "Responses",
+      "empty": "No responses yet.",
+      "complete": "Complete",
+      "partial": "Partial",
+      "started": "Started",
+      "completed": "Completed",
+      "notShown": "Not shown",
+      "hideNonVisible": "Hide non-visible answers"
+    },
+    "invalidation": {
+      "invalidateAll": "Invalidate all results",
+      "invalidateGroup": "Invalidate group results",
+      "invalidateOne": "Invalidate",
+      "invalidated": "Invalidated",
+      "invalidatedAt": "Invalidated",
+      "group": "Group",
+      "selectGroup": "Select group",
+      "reasonPrompt": "Invalidation reason (optional)"
+    },
+    "groupSurveys": {
+      "title": "Group Surveys",
+      "tab": "Surveys",
+      "empty": "No surveys assigned to this group.",
+      "completed": "{{count}} completed",
+      "downloadJson": "Download JSON",
+      "downloadCsv": "Download CSV"
+    }
+  },
+  "surveyGate": {
+    "checking": "Checking for pending surveys...",
+    "retry": "Try Again",
+    "progress": "Question {{current}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "review": "Review answers",
+    "reviewTitle": "Review your answers",
+    "edit": "Edit",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "close": "Close",
+    "requiredError": "This question is required.",
+    "yes": "Yes",
+    "no": "No",
+    "noAnswer": "No answer",
+    "typeAnswer": "Type your answer...",
+    "submitError": "Submission failed. Please try again.",
+    "validation": {
+      "integerSigned": "Please enter a valid whole number",
+      "integerUnsigned": "Please enter a non-negative whole number",
+      "decimal": "Please enter a valid number",
+      "email": "Please enter a valid email address",
+      "phone": "Please enter a valid phone number",
+      "url": "Please enter a valid URL",
+      "postal_code": "Please enter a valid postal code",
+      "alphanumeric_code": "Please enter only letters and numbers"
+    }
+  }
+}
+

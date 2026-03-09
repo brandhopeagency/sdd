@@ -1,0 +1,206 @@
+openapi: 3.0.3
+info:
+  title: Review Administration API
+  version: 1.0.0
+  description: Endpoints for moderation system configuration and reviewer management.
+servers:
+  - url: /api
+paths:
+  /review/config:
+    get:
+      summary: Get active review configuration
+      responses:
+        "200":
+          description: Current configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewConfig"
+    patch:
+      summary: Update review configuration (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewConfigUpdate"
+      responses:
+        "200":
+          description: Updated configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: array
+                    items:
+                      type: string
+                  config:
+                    $ref: "#/components/schemas/ReviewConfig"
+        "400":
+          description: Validation error
+  /review/reviewers:
+    get:
+      summary: List reviewers and qualification state (moderator+)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, inactive, suspended, all]
+            default: all
+      responses:
+        "200":
+          description: Reviewer list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ReviewerProfile"
+  /review/reviewers/{reviewerId}/assign:
+    post:
+      summary: Manually assign session to reviewer (moderator+)
+      parameters:
+        - in: path
+          name: reviewerId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId]
+              properties:
+                sessionId:
+                  type: string
+                reservationHours:
+                  type: integer
+                  minimum: 1
+      responses:
+        "200":
+          description: Assignment created
+  /review/reviewers/{reviewerId}/status:
+    patch:
+      summary: Update reviewer qualification status (admin only)
+      parameters:
+        - in: path
+          name: reviewerId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [qualificationStatus]
+              properties:
+                qualificationStatus:
+                  type: string
+                  enum: [active, inactive, suspended]
+      responses:
+        "200":
+          description: Reviewer status updated
+components:
+  schemas:
+    ReviewConfig:
+      type: object
+      required:
+        - minReviewsRequired
+        - maxReviewsAllowed
+        - criteriaThreshold
+        - autoFlagThreshold
+        - scoreVarianceLimit
+        - reviewTimeoutHours
+        - highRiskResponseHours
+        - mediumRiskResponseHours
+      properties:
+        minReviewsRequired:
+          type: integer
+          minimum: 1
+          maximum: 10
+        maxReviewsAllowed:
+          type: integer
+          minimum: 1
+          maximum: 10
+        criteriaThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        autoFlagThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        scoreVarianceLimit:
+          type: number
+          minimum: 0.5
+          maximum: 5.0
+        reviewTimeoutHours:
+          type: integer
+          minimum: 1
+        highRiskResponseHours:
+          type: integer
+          minimum: 1
+        mediumRiskResponseHours:
+          type: integer
+          minimum: 1
+    ReviewConfigUpdate:
+      type: object
+      properties:
+        minReviewsRequired:
+          type: integer
+          minimum: 1
+          maximum: 10
+        maxReviewsAllowed:
+          type: integer
+          minimum: 1
+          maximum: 10
+        criteriaThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        autoFlagThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        scoreVarianceLimit:
+          type: number
+          minimum: 0.5
+          maximum: 5.0
+        reviewTimeoutHours:
+          type: integer
+          minimum: 1
+        highRiskResponseHours:
+          type: integer
+          minimum: 1
+        mediumRiskResponseHours:
+          type: integer
+          minimum: 1
+    ReviewerProfile:
+      type: object
+      properties:
+        reviewerId:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: string
+          enum: [reviewer, senior_reviewer, moderator, commander, admin]
+        qualificationStatus:
+          type: string
+          enum: [active, inactive, suspended]
+        languages:
+          type: array
+          items:
+            type: string
+        queueLoad:
+          type: integer

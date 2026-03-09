@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: Reviewer Configuration API
+  version: 1.0.0
+  description: Per-group reviewer count and supervision policy configuration
+
+paths:
+  /api/admin/review-config/groups/{groupId}:
+    get:
+      summary: Get group-specific review configuration
+      description: Returns the review configuration override for a specific group. NULL fields indicate global default is used.
+      tags: [ReviewConfig]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Group review config (may be empty if no overrides set)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupReviewConfig' }
+        '404':
+          description: Group not found
+
+    put:
+      summary: Set or update group-specific review configuration
+      description: Create or update per-group overrides for reviewer count and supervision policy. Set fields to null to revert to global defaults.
+      tags: [ReviewConfig]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateGroupReviewConfigInput' }
+      responses:
+        '200':
+          description: Updated group review config
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupReviewConfig' }
+        '400':
+          description: Validation error
+        '403':
+          description: Requires REVIEW_CONFIGURE or REVIEW_SUPERVISION_CONFIG permission
+
+    delete:
+      summary: Remove group-specific review configuration
+      description: Deletes all per-group overrides, reverting the group to global defaults.
+      tags: [ReviewConfig]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: Group config removed, global defaults now apply
+        '403':
+          description: Requires REVIEW_CONFIGURE permission
+
+  /api/admin/review-config/groups:
+    get:
+      summary: List all group review configurations
+      description: Returns all per-group review configuration overrides alongside the global defaults.
+      tags: [ReviewConfig]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All group configs with effective values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  globalDefaults:
+                    $ref: '#/components/schemas/GlobalReviewConfig'
+                  groupOverrides:
+                    type: array
+                    items: { $ref: '#/components/schemas/GroupReviewConfigWithGroupName' }
+
+  /api/admin/review-config:
+    patch:
+      summary: Update global review configuration (extended)
+      description: Extends the existing review config endpoint to support supervision policy fields.
+      tags: [ReviewConfig]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                minReviews: { type: integer, minimum: 1 }
+                maxReviews: { type: integer, minimum: 1 }
+                criteriaThreshold: { type: integer, minimum: 1, maximum: 10 }
+                varianceLimit: { type: number }
+                supervisionPolicy: { type: string, enum: [all, sampled, none] }
+                supervisionSamplePercentage: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: Updated global config
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GlobalReviewConfig' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GroupReviewConfig:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        groupId: { type: string, format: uuid }
+        reviewerCountOverride: { type: integer, nullable: true, minimum: 1 }
+        supervisionPolicy: { type: string, enum: [all, sampled, none], nullable: true }
+        supervisionSamplePercentage: { type: integer, nullable: true, minimum: 1, maximum: 100 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    GroupReviewConfigWithGroupName:
+      allOf:
+        - $ref: '#/components/schemas/GroupReviewConfig'
+        - type: object
+          properties:
+            groupName: { type: string }
+
+    UpdateGroupReviewConfigInput:
+      type: object
+      properties:
+        reviewerCountOverride: { type: integer, nullable: true, minimum: 1 }
+        supervisionPolicy: { type: string, enum: [all, sampled, none], nullable: true }
+        supervisionSamplePercentage: { type: integer, nullable: true, minimum: 1, maximum: 100 }
+
+    GlobalReviewConfig:
+      type: object
+      properties:
+        minReviews: { type: integer }
+        maxReviews: { type: integer }
+        criteriaThreshold: { type: integer }
+        varianceLimit: { type: number }
+        supervisionPolicy: { type: string, enum: [all, sampled, none] }
+        supervisionSamplePercentage: { type: integer }

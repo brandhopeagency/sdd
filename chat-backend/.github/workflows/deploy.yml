@@ -1,0 +1,305 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - dev
+          - prod
+  repository_dispatch:
+    types: [chat-types-updated]
+
+env:
+  GCP_REGION: europe-west1
+  ARTIFACT_REGISTRY: chat-backend
+
+jobs:
+  setup:
+    name: Setup Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      cloud_run_service: ${{ steps.set-env.outputs.cloud_run_service }}
+      workbench_service: ${{ steps.set-env.outputs.workbench_service }}
+      cloud_sql_connection: ${{ steps.set-env.outputs.cloud_sql_connection }}
+      database_secret: ${{ steps.set-env.outputs.database_secret }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            ENV="prod"
+          else
+            ENV="dev"
+          fi
+
+          if [ "$ENV" = "prod" ]; then
+            CHAT_SERVICE="chat-backend"
+            WORKBENCH_SERVICE="workbench-backend"
+            DATABASE_SECRET="database-url-prod"
+          else
+            CHAT_SERVICE="chat-backend-dev"
+            WORKBENCH_SERVICE="workbench-backend-dev"
+            DATABASE_SECRET="database-url-dev"
+          fi
+
+          CLOUD_SQL_CONNECTION="${{ vars.CLOUD_SQL_CONNECTION }}"
+          if [ "$ENV" = "prod" ]; then
+            if [ -z "$CLOUD_SQL_CONNECTION" ]; then
+              CLOUD_SQL_CONNECTION="mental-help-global-25:europe-west1:chat-db"
+            fi
+          else
+            if [ -z "$CLOUD_SQL_CONNECTION" ] || [ "$CLOUD_SQL_CONNECTION" = "mental-help-global-25:europe-west1:chat-db" ]; then
+              CLOUD_SQL_CONNECTION="mental-help-global-25:europe-west1:chat-db-dev"
+            fi
+          fi
+
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          echo "cloud_run_service=$CHAT_SERVICE" >> $GITHUB_OUTPUT
+          echo "workbench_service=$WORKBENCH_SERVICE" >> $GITHUB_OUTPUT
+          echo "cloud_sql_connection=$CLOUD_SQL_CONNECTION" >> $GITHUB_OUTPUT
+          echo "database_secret=$DATABASE_SECRET" >> $GITHUB_OUTPUT
+          echo "### Deployment Target" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: **$ENV**" >> $GITHUB_STEP_SUMMARY
+          echo "- Chat Service: **$CHAT_SERVICE**" >> $GITHUB_STEP_SUMMARY
+          echo "- Workbench Service: **$WORKBENCH_SERVICE**" >> $GITHUB_STEP_SUMMARY
+          echo "- Cloud SQL: **$CLOUD_SQL_CONNECTION**" >> $GITHUB_STEP_SUMMARY
+          echo "- DATABASE_URL secret: **$DATABASE_SECRET**" >> $GITHUB_STEP_SUMMARY
+
+  test:
+    name: Typecheck & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-types
+          ref: main
+          path: chat-types
+          token: ${{ secrets.PKG_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Build chat-types locally
+        run: cd chat-types && npm install && npm run build
+      - name: Install dependencies
+        run: |
+          npm pkg set "dependencies.@mentalhelpglobal/chat-types=file:./chat-types"
+          npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(cat coverage/coverage-summary.json 2>/dev/null | jq -r '.total.statements.pct // 0')
+          if (( $(echo "$COVERAGE < 45" | bc -l) )); then
+            echo "::error::Coverage $COVERAGE% is below threshold 45%"
+            exit 1
+          fi
+          echo "Coverage: $COVERAGE%"
+
+  deploy:
+    name: Deploy Backend
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MentalHelpGlobal/chat-types
+          ref: main
+          path: chat-types
+          token: ${{ secrets.PKG_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Build chat-types locally
+        run: cd chat-types && npm install && npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PKG_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+      - name: Build Docker image
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${SERVICE}:${{ github.sha }}"
+          docker build \
+            --build-arg GITHUB_TOKEN=${{ secrets.PKG_TOKEN }} \
+            -t "$IMAGE" .
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+      - name: Push Docker image
+        run: docker push "$IMAGE"
+      - name: Resolve Vertex AI defaults
+        id: vertex
+        run: |
+          VERTEX_MODEL="${{ vars.VERTEX_MODEL }}"
+          if [ -z "$VERTEX_MODEL" ] || [ "$VERTEX_MODEL" = "gemini-1.5-flash" ]; then
+            VERTEX_MODEL="publishers/google/models/gemini-2.5-flash-lite"
+          fi
+          VERTEX_LOCATION="${{ vars.VERTEX_LOCATION }}"
+          if [ -z "$VERTEX_LOCATION" ]; then
+            VERTEX_LOCATION="us-central1"
+          fi
+          echo "model=$VERTEX_MODEL" >> $GITHUB_OUTPUT
+          echo "location=$VERTEX_LOCATION" >> $GITHUB_OUTPUT
+
+      - name: Deploy chat backend to Cloud Run
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+
+          CLOUD_SQL_FLAG=""
+          CLOUD_SQL_CONNECTION="${{ needs.setup.outputs.cloud_sql_connection }}"
+          if [ -n "$CLOUD_SQL_CONNECTION" ]; then
+            CLOUD_SQL_FLAG="--add-cloudsql-instances=$CLOUD_SQL_CONNECTION"
+          fi
+
+          VPC_FLAG=""
+          if [ -n "${{ vars.VPC_CONNECTOR }}" ]; then
+            VPC_FLAG="--vpc-connector=${{ vars.VPC_CONNECTOR }} --vpc-egress=private-ranges-only --clear-network"
+          elif [ -n "${{ vars.REDIS_HOST }}" ]; then
+            VPC_FLAG="--network=${{ vars.VPC_NETWORK || 'default' }} --subnet=${{ vars.VPC_SUBNET || 'default' }} --vpc-egress=private-ranges-only --clear-vpc-connector"
+          fi
+
+          gcloud run deploy $SERVICE \
+            --image="${IMAGE}" \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            $CLOUD_SQL_FLAG \
+            $VPC_FLAG \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="SERVICE_SURFACE=chat" \
+            --set-env-vars="FRONTEND_URL=${{ vars.FRONTEND_URL }}" \
+            --set-env-vars="DIALOGFLOW_PROJECT_ID=${{ vars.DIALOGFLOW_PROJECT_ID }}" \
+            --set-env-vars="DIALOGFLOW_AGENT_ID=${{ vars.DIALOGFLOW_AGENT_ID }}" \
+            --set-env-vars="DIALOGFLOW_LOCATION=${{ vars.DIALOGFLOW_LOCATION }}" \
+            --set-env-vars="LLM_PROVIDER=${{ vars.LLM_PROVIDER }}" \
+            --set-env-vars="VERTEX_PROJECT_ID=${{ vars.VERTEX_PROJECT_ID }}" \
+            --set-env-vars="VERTEX_LOCATION=${{ steps.vertex.outputs.location }}" \
+            --set-env-vars="VERTEX_MODEL=${{ steps.vertex.outputs.model }}" \
+            --set-env-vars="EMAIL_PROVIDER=${{ vars.EMAIL_PROVIDER }}" \
+            --set-env-vars="EMAIL_FROM=${{ vars.EMAIL_FROM }}" \
+            --set-env-vars="GMAIL_CLIENT_ID=${{ vars.GMAIL_CLIENT_ID }}" \
+            --set-env-vars="GCS_BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" \
+            --set-env-vars="REDIS_HOST=${{ vars.REDIS_HOST }}" \
+            --set-env-vars="REDIS_PORT=${{ vars.REDIS_PORT || '6379' }}" \
+            --set-env-vars="DB_RETRY_MAX_ATTEMPTS=${{ vars.DB_RETRY_MAX_ATTEMPTS || '3' }}" \
+            --set-env-vars="DB_RETRY_INITIAL_DELAY_MS=${{ vars.DB_RETRY_INITIAL_DELAY_MS || '500' }}" \
+            --set-env-vars="DB_RETRY_MAX_DELAY_MS=${{ vars.DB_RETRY_MAX_DELAY_MS || '5000' }}" \
+            --set-env-vars="OTP_RATE_LIMIT_MAX=${{ vars.OTP_RATE_LIMIT_MAX || '5' }}" \
+            --set-env-vars="OTP_RATE_LIMIT_WINDOW_SECONDS=${{ vars.OTP_RATE_LIMIT_WINDOW_SECONDS || '60' }}" \
+            --set-env-vars="OTP_REQUEST_RATE_LIMIT_MAX=${{ vars.OTP_REQUEST_RATE_LIMIT_MAX || '3' }}" \
+            --set-env-vars="OTP_REQUEST_RATE_LIMIT_WINDOW_SECONDS=${{ vars.OTP_REQUEST_RATE_LIMIT_WINDOW_SECONDS || '300' }}" \
+            --set-secrets="DATABASE_URL=${{ needs.setup.outputs.database_secret }}:latest" \
+            --set-secrets="JWT_SECRET=jwt-secret:latest" \
+            --set-secrets="JWT_REFRESH_SECRET=jwt-refresh-secret:latest" \
+            --set-secrets="GMAIL_CLIENT_SECRET=gmail-client-secret:latest" \
+            --set-secrets="GMAIL_REFRESH_TOKEN=gmail-refresh-token:latest" \
+            --set-secrets="GOOGLE_OAUTH_CLIENT_ID=google-oauth-client-id:latest" \
+            --min-instances=0 \
+            --max-instances=10 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=60
+
+      - name: Deploy workbench backend to Cloud Run
+        run: |
+          SERVICE="${{ needs.setup.outputs.workbench_service }}"
+
+          CLOUD_SQL_FLAG=""
+          CLOUD_SQL_CONNECTION="${{ needs.setup.outputs.cloud_sql_connection }}"
+          if [ -n "$CLOUD_SQL_CONNECTION" ]; then
+            CLOUD_SQL_FLAG="--add-cloudsql-instances=$CLOUD_SQL_CONNECTION"
+          fi
+
+          VPC_FLAG=""
+          if [ -n "${{ vars.VPC_CONNECTOR }}" ]; then
+            VPC_FLAG="--vpc-connector=${{ vars.VPC_CONNECTOR }} --vpc-egress=private-ranges-only --clear-network"
+          elif [ -n "${{ vars.REDIS_HOST }}" ]; then
+            VPC_FLAG="--network=${{ vars.VPC_NETWORK || 'default' }} --subnet=${{ vars.VPC_SUBNET || 'default' }} --vpc-egress=private-ranges-only --clear-vpc-connector"
+          fi
+
+          gcloud run deploy $SERVICE \
+            --image="${IMAGE}" \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            $CLOUD_SQL_FLAG \
+            $VPC_FLAG \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="SERVICE_SURFACE=workbench" \
+            --set-env-vars="FRONTEND_URL=${{ vars.WORKBENCH_FRONTEND_URL }}" \
+            --set-env-vars="WORKBENCH_FRONTEND_URL=${{ vars.WORKBENCH_FRONTEND_URL }}" \
+            --set-env-vars="DIALOGFLOW_PROJECT_ID=${{ vars.DIALOGFLOW_PROJECT_ID }}" \
+            --set-env-vars="DIALOGFLOW_AGENT_ID=${{ vars.DIALOGFLOW_AGENT_ID }}" \
+            --set-env-vars="DIALOGFLOW_LOCATION=${{ vars.DIALOGFLOW_LOCATION }}" \
+            --set-env-vars="LLM_PROVIDER=${{ vars.LLM_PROVIDER }}" \
+            --set-env-vars="VERTEX_PROJECT_ID=${{ vars.VERTEX_PROJECT_ID }}" \
+            --set-env-vars="VERTEX_LOCATION=${{ steps.vertex.outputs.location }}" \
+            --set-env-vars="VERTEX_MODEL=${{ steps.vertex.outputs.model }}" \
+            --set-env-vars="EMAIL_PROVIDER=${{ vars.EMAIL_PROVIDER }}" \
+            --set-env-vars="EMAIL_FROM=${{ vars.EMAIL_FROM }}" \
+            --set-env-vars="GMAIL_CLIENT_ID=${{ vars.GMAIL_CLIENT_ID }}" \
+            --set-env-vars="GCS_BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" \
+            --set-env-vars="REDIS_HOST=${{ vars.REDIS_HOST }}" \
+            --set-env-vars="REDIS_PORT=${{ vars.REDIS_PORT || '6379' }}" \
+            --set-env-vars="DB_RETRY_MAX_ATTEMPTS=${{ vars.DB_RETRY_MAX_ATTEMPTS || '3' }}" \
+            --set-env-vars="DB_RETRY_INITIAL_DELAY_MS=${{ vars.DB_RETRY_INITIAL_DELAY_MS || '500' }}" \
+            --set-env-vars="DB_RETRY_MAX_DELAY_MS=${{ vars.DB_RETRY_MAX_DELAY_MS || '5000' }}" \
+            --set-env-vars="OTP_RATE_LIMIT_MAX=${{ vars.OTP_RATE_LIMIT_MAX || '5' }}" \
+            --set-env-vars="OTP_RATE_LIMIT_WINDOW_SECONDS=${{ vars.OTP_RATE_LIMIT_WINDOW_SECONDS || '60' }}" \
+            --set-env-vars="OTP_REQUEST_RATE_LIMIT_MAX=${{ vars.OTP_REQUEST_RATE_LIMIT_MAX || '3' }}" \
+            --set-env-vars="OTP_REQUEST_RATE_LIMIT_WINDOW_SECONDS=${{ vars.OTP_REQUEST_RATE_LIMIT_WINDOW_SECONDS || '300' }}" \
+            --set-secrets="DATABASE_URL=${{ needs.setup.outputs.database_secret }}:latest" \
+            --set-secrets="JWT_SECRET=jwt-secret:latest" \
+            --set-secrets="JWT_REFRESH_SECRET=jwt-refresh-secret:latest" \
+            --set-secrets="GMAIL_CLIENT_SECRET=gmail-client-secret:latest" \
+            --set-secrets="GMAIL_REFRESH_TOKEN=gmail-refresh-token:latest" \
+            --set-secrets="GOOGLE_OAUTH_CLIENT_ID=google-oauth-client-id:latest" \
+            --min-instances=0 \
+            --max-instances=10 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=60
+
+      - name: Output service URLs
+        run: |
+          CHAT_SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          WB_SERVICE="${{ needs.setup.outputs.workbench_service }}"
+          CHAT_URL=$(gcloud run services describe $CHAT_SERVICE \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.url)')
+          WB_URL=$(gcloud run services describe $WB_SERVICE \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.url)')
+          echo "### Backend deployed! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "- Chat Service: **$CHAT_SERVICE** → $CHAT_URL" >> $GITHUB_STEP_SUMMARY
+          echo "- Workbench Service: **$WB_SERVICE** → $WB_URL" >> $GITHUB_STEP_SUMMARY

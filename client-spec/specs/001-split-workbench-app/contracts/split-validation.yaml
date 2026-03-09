@@ -1,0 +1,247 @@
+# Split Validation Contract
+# Defines the verification endpoints and expected behaviors for validating
+# the frontend split is working correctly.
+#
+# This is not an API contract (no new endpoints are created) — it's a
+# behavioral contract that documents expected responses from existing
+# endpoints when accessed from each application surface.
+
+openapi: 3.1.0
+info:
+  title: Frontend Split Validation Contract
+  version: 1.0.0
+  description: |
+    Behavioral validation contract for the chat/workbench frontend split.
+    Documents expected behavior of existing endpoints when accessed from
+    each application surface, cross-surface navigation, and auth flow.
+
+paths:
+  /api/auth/me:
+    get:
+      summary: Verify authenticated session (shared endpoint)
+      description: |
+        Both applications call this on startup to verify the user's session.
+        Must return the same user data regardless of which surface makes the call.
+      operationId: getAuthMe
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user with permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+              examples:
+                chatUser:
+                  summary: User with chat-only access
+                  value:
+                    id: "user-123"
+                    role: "user"
+                    permissions: ["chat:access", "chat:send", "chat:feedback"]
+                    status: "active"
+                workbenchUser:
+                  summary: User with workbench access
+                  value:
+                    id: "user-456"
+                    role: "moderator"
+                    permissions: ["chat:access", "chat:send", "workbench:access", "workbench:user_management", "review:access"]
+                    status: "active"
+        '401':
+          description: Not authenticated — no valid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/refresh:
+    post:
+      summary: Silent token refresh (cross-surface auth)
+      description: |
+        Called when an application has no access token in localStorage but
+        the refresh token cookie (Domain=.mentalhelp.chat) is present.
+        Critical for cross-surface SSO — enables navigating from chat to
+        workbench without re-authentication.
+      operationId: refreshToken
+      security: []
+      parameters:
+        - name: Cookie
+          in: cookie
+          description: Refresh token cookie scoped to .mentalhelp.chat
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: New access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: New JWT access token
+                  user:
+                    $ref: '#/components/schemas/AuthenticatedUser'
+          headers:
+            Set-Cookie:
+              description: Rotated refresh token cookie with Domain=.mentalhelp.chat
+              schema:
+                type: string
+        '401':
+          description: Invalid or revoked refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/logout:
+    post:
+      summary: Sign out (cross-surface invalidation)
+      description: |
+        Revokes the refresh token server-side and clears the cookie with
+        Domain=.mentalhelp.chat. After this call, the other application
+        will receive 401 on its next API request and must redirect to login.
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Session invalidated
+          headers:
+            Set-Cookie:
+              description: Cleared refresh token cookie (Max-Age=0, Domain=.mentalhelp.chat)
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AuthenticatedUser:
+      type: object
+      required: [id, role, permissions, status]
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, qa_specialist, researcher, moderator, group_admin, owner]
+        permissions:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, pending, blocked, disapproved, anonymized]
+        groupId:
+          type: string
+          nullable: true
+        memberships:
+          type: array
+          items:
+            type: object
+            properties:
+              groupId:
+                type: string
+              role:
+                type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+---
+# Behavioral Validation Scenarios
+#
+# These scenarios define expected behavior that E2E tests should verify
+# after the split is complete.
+
+x-validation-scenarios:
+  cross-surface-navigation:
+    - name: Chat to workbench (authorized user)
+      given: User is authenticated on mentalhelp.chat with WORKBENCH_ACCESS permission
+      when: User clicks workbench link
+      then: Browser navigates to workbench.mentalhelp.chat, silent refresh authenticates, workbench loads
+
+    - name: Chat to workbench (unauthorized user)
+      given: User is authenticated on mentalhelp.chat WITHOUT WORKBENCH_ACCESS permission
+      when: User navigates directly to workbench.mentalhelp.chat
+      then: Silent refresh succeeds but workbench access denied page shown with link back to chat
+
+    - name: Workbench to chat
+      given: User is authenticated on workbench.mentalhelp.chat
+      when: User clicks "Back to Chat" link
+      then: Browser navigates to mentalhelp.chat, silent refresh authenticates, chat loads
+
+  legacy-redirects:
+    - name: Workbench route on chat domain
+      given: User visits mentalhelp.chat/workbench/users
+      when: Chat app detects /workbench/* route
+      then: Redirect to workbench.mentalhelp.chat/workbench/users
+
+    - name: Chat route on workbench domain
+      given: User visits workbench.mentalhelp.chat/chat
+      when: Workbench app detects /chat/* route
+      then: Redirect to mentalhelp.chat/chat
+
+    - name: Hash-based deep link
+      given: User visits mentalhelp.chat#/chat/session-123
+      when: App detects hash-based path
+      then: Replace with mentalhelp.chat/chat/session-123 (same surface)
+
+  auth-flow:
+    - name: Sign out propagation
+      given: User is authenticated on both surfaces (two tabs)
+      when: User signs out from chat tab
+      then: |
+        1. Refresh token revoked, cookie cleared for .mentalhelp.chat
+        2. Workbench tab's next API call returns 401
+        3. Workbench clears state and redirects to login
+
+    - name: Silent refresh on cross-surface navigation
+      given: User is authenticated on mentalhelp.chat only
+      when: User navigates to workbench.mentalhelp.chat
+      then: |
+        1. No access token in workbench localStorage
+        2. App calls /api/auth/refresh with credentials: include
+        3. Refresh token cookie sent to api.workbench.mentalhelp.chat
+        4. New access token stored in workbench localStorage
+        5. User is authenticated seamlessly
+
+  independent-deployment:
+    - name: Chat-only deployment
+      given: Only chat-frontend is deployed with new code
+      when: Deployment completes
+      then: |
+        1. mentalhelp.chat loads new chat version
+        2. workbench.mentalhelp.chat continues serving previous workbench version
+        3. Cross-surface navigation works correctly
+
+    - name: Workbench-only deployment
+      given: Only workbench-frontend is deployed with new code
+      when: Deployment completes
+      then: |
+        1. workbench.mentalhelp.chat loads new workbench version
+        2. mentalhelp.chat continues serving previous chat version
+        3. Cross-surface navigation works correctly
+
+  permission-enforcement:
+    - name: Workbench access denied
+      given: User with role USER (no WORKBENCH_ACCESS)
+      when: Navigates to workbench.mentalhelp.chat
+      then: Access denied page with clear message and link to mentalhelp.chat
+
+    - name: Workbench sub-route permission
+      given: User with WORKBENCH_ACCESS but no REVIEW_ACCESS
+      when: Navigates to workbench.mentalhelp.chat/workbench/review
+      then: Sub-route denied within workbench — user sees workbench dashboard but not review section

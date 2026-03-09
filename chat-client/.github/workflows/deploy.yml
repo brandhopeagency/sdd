@@ -1,0 +1,213 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+env:
+  GCP_REGION: europe-west1
+  ARTIFACT_REGISTRY: chat-backend
+
+jobs:
+  # Determine which environment to deploy to
+  setup:
+    name: Setup Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      cloud_run_service: ${{ steps.set-env.outputs.cloud_run_service }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            ENV="prod"
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            ENV="dev"
+          else
+            echo "Unknown branch, defaulting to dev"
+            ENV="dev"
+          fi
+          
+          if [ "$ENV" = "prod" ]; then
+            SERVICE="chat-backend"
+          else
+            SERVICE="chat-backend-dev"
+          fi
+          
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          echo "cloud_run_service=$SERVICE" >> $GITHUB_OUTPUT
+          echo "### Deployment Target" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: **$ENV**" >> $GITHUB_STEP_SUMMARY
+          echo "- Cloud Run Service: **$SERVICE**" >> $GITHUB_STEP_SUMMARY
+
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.BACKEND_URL }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Upload to Cloud Storage
+        run: |
+          gsutil -m rsync -r -d dist/ gs://${{ vars.GCS_BUCKET }}/
+          
+      - name: Set Cache-Control headers
+        run: |
+          # Set long cache for hashed assets
+          gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" \
+            "gs://${{ vars.GCS_BUCKET }}/assets/**"
+          
+          # Set short cache for index.html
+          gsutil setmeta -h "Cache-Control:no-cache, no-store, must-revalidate" \
+            "gs://${{ vars.GCS_BUCKET }}/index.html"
+
+      - name: Output frontend URL
+        run: |
+          echo "### Frontend deployed successfully! :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          echo "URL: https://storage.googleapis.com/${{ vars.GCS_BUCKET }}/index.html" >> $GITHUB_STEP_SUMMARY
+
+  deploy-backend:
+    name: Deploy Backend
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image
+        working-directory: server
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${SERVICE}:${{ github.sha }}"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+
+          # Vertex Model Garden publisher model ids can differ per project access.
+          # Default away from legacy gemini-1.5-flash which may be unavailable (404) in some projects.
+          VERTEX_MODEL="${{ vars.VERTEX_MODEL }}"
+          if [ -z "$VERTEX_MODEL" ] || [ "$VERTEX_MODEL" = "gemini-1.5-flash" ]; then
+            VERTEX_MODEL="publishers/google/models/gemini-2.5-flash-lite"
+          fi
+          VERTEX_LOCATION="${{ vars.VERTEX_LOCATION }}"
+          if [ -z "$VERTEX_LOCATION" ]; then
+            VERTEX_LOCATION="us-central1"
+          fi
+          
+          # Cloud SQL connection flag (if configured)
+          CLOUD_SQL_FLAG=""
+          if [ -n "${{ vars.CLOUD_SQL_CONNECTION }}" ]; then
+            CLOUD_SQL_FLAG="--add-cloudsql-instances=${{ vars.CLOUD_SQL_CONNECTION }}"
+          fi
+          
+          gcloud run deploy $SERVICE \
+            --image=${{ env.IMAGE }} \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            $CLOUD_SQL_FLAG \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="FRONTEND_URL=${{ vars.FRONTEND_URL }}" \
+            --set-env-vars="DIALOGFLOW_PROJECT_ID=${{ vars.DIALOGFLOW_PROJECT_ID }}" \
+            --set-env-vars="DIALOGFLOW_AGENT_ID=${{ vars.DIALOGFLOW_AGENT_ID }}" \
+            --set-env-vars="DIALOGFLOW_LOCATION=${{ vars.DIALOGFLOW_LOCATION }}" \
+            --set-env-vars="LLM_PROVIDER=${{ vars.LLM_PROVIDER }}" \
+            --set-env-vars="VERTEX_PROJECT_ID=${{ vars.VERTEX_PROJECT_ID }}" \
+            --set-env-vars="VERTEX_LOCATION=${VERTEX_LOCATION}" \
+            --set-env-vars="VERTEX_MODEL=${VERTEX_MODEL}" \
+            --set-env-vars="EMAIL_PROVIDER=${{ vars.EMAIL_PROVIDER }}" \
+            --set-env-vars="EMAIL_FROM=${{ vars.EMAIL_FROM }}" \
+            --set-env-vars="GMAIL_CLIENT_ID=${{ vars.GMAIL_CLIENT_ID }}" \
+            --set-env-vars="GCS_BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" \
+            --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+            --set-env-vars="JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+            --set-env-vars="JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" \
+            --set-env-vars="GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" \
+            --set-env-vars="GMAIL_REFRESH_TOKEN=${{ secrets.GMAIL_REFRESH_TOKEN }}" \
+            --min-instances=0 \
+            --max-instances=10 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=60
+
+      - name: Output service URL
+        run: |
+          SERVICE="${{ needs.setup.outputs.cloud_run_service }}"
+          URL=$(gcloud run services describe $SERVICE \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.url)')
+          echo "### Backend deployed successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: **$SERVICE**" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: $URL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Vertex AI integration" >> $GITHUB_STEP_SUMMARY
+          echo "- Requires GitHub Environment vars: **LLM_PROVIDER**, **VERTEX_PROJECT_ID**, **VERTEX_LOCATION**, **VERTEX_MODEL**" >> $GITHUB_STEP_SUMMARY
+          echo "- Ensure deploy service account has Vertex permissions (e.g. **roles/aiplatform.user**) and Cloud Run uses ADC via Workload Identity" >> $GITHUB_STEP_SUMMARY
+          echo ""
+          echo "> **Note:** Update BACKEND_URL variable if this is the first deploy" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,1175 @@
+{
+  "app": {
+    "name": "Поддержка психического здоровья",
+    "tagline": "Безопасное пространство для разговора",
+    "description": "Свяжитесь с нашим AI-ассистентом для сочувственной поддержки без осуждения, когда вам это нужно."
+  },
+  "welcome": {
+    "startConversation": "Начать разговор",
+    "signInToStart": "Войти, чтобы начать",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "signIn": "Войти",
+    "signedInAs": "Вы вошли как {{name}}",
+    "privacyNote": "Ваши разговоры приватны и конфиденциальны.",
+    "features": {
+      "private": "Приватно и безопасно",
+      "compassionate": "Сочувственно",
+      "available": "Доступно 24/7"
+    },
+    "footer": {
+      "privacy": "Политика конфиденциальности",
+      "terms": "Условия использования",
+      "crisis": "Кризисные ресурсы"
+    }
+  },
+  "pending": {
+    "title": "Требуется подтверждение",
+    "subtitle": "Ваш аккаунт ожидает подтверждения администратором.",
+    "signedInAs": "Вы вошли как {{email}}",
+    "backToHome": "На главную"
+  },
+  "login": {
+    "title": "Добро пожаловать",
+    "subtitle": "Войдите, чтобы продолжить",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "signInButton": "Войти",
+    "signingIn": "Входим...",
+    "invalidCredentials": "Неверный email или пароль.",
+    "back": "Назад",
+    "otp": {
+      "emailLabel": "Электронная почта",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "Мы отправим вам одноразовый код для входа",
+      "invitationLabel": "Код приглашения (необязательно)",
+      "invitationPlaceholder": "Введите код приглашения",
+      "invitationHint": "Используйте код для подачи заявки в группу",
+      "sendCode": "Отправить код",
+      "sending": "Отправляем...",
+      "codeLabel": "Код подтверждения",
+      "codeHint": "Введите 6-значный код из письма",
+      "verify": "Подтвердить",
+      "verifying": "Проверяем...",
+      "changeEmail": "Изменить email",
+      "codeSent": "Код отправлен на",
+      "invalidEmail": "Введите корректный email адрес",
+      "invalidCode": "Введите 6-значный код",
+      "invalid_otp": "Неверный код. Попробуйте ещё раз.",
+      "otp_expired": "Код устарел. Запросите новый.",
+      "account_pending_approval": "Ваш аккаунт ожидает одобрения.",
+      "account_disapproved": "Ваш аккаунт был отклонён.",
+      "disapproved_cooling_off": "Аккаунт отклонён. Повторная заявка возможна после периода ожидания.",
+      "invalid_invitation_code": "Код приглашения должен быть буквенно-цифровым.",
+      "invitation_code_not_found": "Код приглашения не найден.",
+      "guest_disabled": "Гостевой режим отключён.",
+      "otp_disabled_workbench": "Вход по email недоступен для этого приложения.",
+      "google_login_failed": "Ошибка входа через Google. Попробуйте ещё раз."
+    },
+    "google": {
+      "error": "Ошибка входа через Google. Попробуйте ещё раз.",
+      "noCredential": "Учётные данные от Google не получены."
+    },
+    "divider": "или",
+    "noMethodsAvailable": "В настоящее время нет доступных методов входа."
+  },
+  "chat": {
+    "header": {
+      "title": "Ассистент психического здоровья",
+      "subtitle": "Здесь, чтобы поддержать вас"
+    },
+    "input": {
+      "placeholder": "Введите ваше сообщение...",
+      "send": "Отправить",
+      "debugTip": "Совет: Введите /debug:enable для режима отладки"
+    },
+    "session": {
+      "end": "Завершить чат",
+      "new": "Новая сессия",
+      "starting": "Запускаем сессию..."
+    },
+    "memory": {
+      "updating": "Обновляем память в фоне…"
+    },
+    "memoryCollapsedHint": "{{count}} блоков",
+    "messages": {
+      "assistant": "Ассистент",
+      "you": "Вы",
+      "helpful": "Полезно",
+      "notHelpful": "Не полезно",
+      "giveFeedback": "Оставить подробный отзыв",
+      "feedbackSubmitted": "Отзыв отправлен",
+      "thanks": "Спасибо!"
+    },
+    "debug": {
+      "title": "Режим отладки",
+      "info": "Информация отладки",
+      "intent": "Намерение",
+      "confidence": "Уверенность",
+      "responseTime": "Время ответа",
+      "parameters": "Параметры",
+      "systemPrompts": "Системные промпты",
+      "summarizationPrompt": "Промпт суммаризации/поиска",
+      "searchResultsUsedInMainPrompt": "Результаты, использованные в основном промпте",
+      "userMemory": "Память пользователя",
+      "loading": "Загрузка…",
+      "loadFailed": "Не удалось загрузить",
+      "memoryEmpty": "Память пуста или ещё не сформирована для этого пользователя"
+    },
+    "guest": "Гость",
+    "register": "Зарегистрироваться",
+    "registerPopup": {
+      "title": "Регистрация",
+      "subtitle": "Сохраните ваш чат",
+      "chatPreserved": "Ваш текущий разговор будет сохранён за вашим аккаунтом"
+    }
+  },
+  "feedback": {
+    "title": "Оставить отзыв",
+    "question": "Насколько полезным был этот ответ?",
+    "selectRating": "Выберите оценку",
+    "ratings": {
+      "poor": "Плохо",
+      "fair": "Удовлетворительно",
+      "good": "Хорошо",
+      "great": "Отлично",
+      "excellent": "Превосходно"
+    },
+    "comment": "Дополнительные комментарии (необязательно)",
+    "commentPlaceholder": "Расскажите больше о вашем опыте...",
+    "cancel": "Отмена",
+    "submit": "Отправить отзыв"
+  },
+  "workbench": {
+    "title": "Рабочее пространство",
+    "subtitle": "Панель администратора",
+    "scopeSelector": {
+      "label": "Пространство",
+      "ariaLabel": "Выбор пространства",
+      "global": "Глобальный",
+      "placeholder": "Выберите пространство"
+    },
+    "groupSelector": {
+      "label": "Группа",
+      "ariaLabel": "Выбор группы"
+    },
+    "nav": {
+      "dashboard": "Панель управления",
+      "groupDashboard": "Дашборд группы",
+      "groupUsers": "Пользователи группы",
+      "groupChats": "Чаты группы",
+      "groupSection": "Ресурсы группы",
+      "users": "Управление пользователями",
+      "groups": "Управление группами",
+      "approvals": "Одобрения",
+      "research": "Исследования и модерация",
+      "privacy": "Контроль конфиденциальности",
+      "reviewReports": "Отчеты и аналитика",
+      "tagManagement": "Управление тегами",
+      "surveySchemas": "Схемы опросов",
+      "surveyInstances": "Экземпляры опросов",
+      "settings": "Настройки",
+      "backToChat": "Вернуться к чату"
+    },
+    "groupSelector": {
+      "label": "Активная группа"
+    },
+    "pii": {
+      "masked": "Скрыто",
+      "visible": "Видимо",
+      "label": "PII",
+      "safeForSharing": "Безопасно для демонстрации экрана"
+    }
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "Добро пожаловать",
+    "stats": {
+      "activeUsers": "Активные пользователи",
+      "pendingApprovals": "Ожидают одобрения",
+      "blockedUsers": "Заблокированные пользователи",
+      "pendingReview": "Ожидают проверки",
+      "activeSessions": "Активные сессии",
+      "thisWeek": "+12% на этой неделе",
+      "requiresAttention": "Требует внимания",
+      "awaitingApproval": "Ожидают проверки",
+      "awaitingModeration": "Сессии ожидают модерации",
+      "inProgress": "В процессе"
+    },
+    "recentSessions": "Последние сессии",
+    "recentUsers": "Последние пользователи",
+    "messages": "сообщений",
+    "moderationProgress": "Прогресс модерации",
+    "reviewed": "проверено"
+  },
+  "group": {
+    "dashboard": {
+      "title": "Дашборд группы",
+      "welcome": "Добро пожаловать",
+      "groupLabel": "Группа",
+      "unknownGroup": "Неизвестно",
+      "noGroup": "Выберите группу для просмотра панели",
+      "stats": {
+        "groupUsers": "Пользователи группы",
+        "activeUsers": "Активные",
+        "blockedUsers": "Заблокированные",
+        "sessionsTotal": "Сессии",
+        "activeSessions": "Активные сессии",
+        "pendingReview": "Ожидают проверки"
+      },
+      "quickActions": {
+        "title": "Быстрые действия",
+        "subtitle": "Частые задачи администратора группы",
+        "manageUsers": "Управлять пользователями группы",
+        "viewChats": "Просмотреть анонимизированные чаты"
+      },
+      "security": {
+        "title": "Границы доступа",
+        "notice": "Вы можете просматривать и управлять пользователями и чатами только в рамках вашей группы. Чаты всегда отображаются в анонимизированном виде."
+      }
+    },
+    "users": {
+      "title": "Пользователи группы",
+      "subtitle": "Просмотр и управление пользователями в вашей группе",
+      "invites": {
+        "title": "Коды приглашения",
+        "subtitle": "Сгенерируйте код, чтобы пользователи могли запросить доступ к этой группе",
+        "generate": "Сгенерировать код",
+        "copy": "Копировать",
+        "copied": "Скопировано"
+      },
+      "requests": {
+        "title": "Запросы на вступление",
+        "subtitle": "Подтвердите или отклоните пользователей, запрашивающих доступ к группе",
+        "empty": "Нет ожидающих запросов",
+        "approve": "Подтвердить",
+        "reject": "Отклонить"
+      },
+      "noGroup": "Выберите группу для просмотра пользователей",
+      "search": "Поиск по имени или email...",
+      "addByEmail": "Добавить пользователя по email",
+      "add": "Добавить в группу",
+      "remove": "Удалить",
+      "readOnly": "Только просмотр"
+    },
+    "sessions": {
+      "title": "Чаты группы",
+      "subtitle": "Анонимизированные чаты в рамках вашей группы",
+      "noGroup": "Выберите группу для просмотра сессий",
+      "search": "Поиск по ID сессии...",
+      "emptyConversation": "В этой сессии пока нет сообщений",
+      "back": "Назад к сессиям"
+    }
+  },
+  "groups": {
+    "title": "Группы",
+    "subtitle": "Создание и управление группами пользователей",
+    "refresh": "Обновить",
+    "list": "Все группы",
+    "create": "Создать группу",
+    "createPlaceholder": "Название группы",
+    "details": "Детали группы",
+    "rename": "Переименовать",
+    "members": "Участники",
+    "addMember": "Добавить",
+    "addMemberPlaceholder": "user@example.com",
+    "memberRole": "Участник",
+    "adminRole": "Администратор",
+    "removeMember": "Удалить участника",
+    "noMembers": "Участники не найдены",
+    "invites": "Коды приглашения",
+    "inviteCodePlaceholder": "INVITE123",
+    "createInvite": "Создать код",
+    "inviteExpires": "Истекает {{date}}",
+    "inviteNoExpiry": "Без срока",
+    "inviteInactive": "Неактивен",
+    "deactivateInvite": "Деактивировать",
+    "noInvites": "Коды приглашения отсутствуют",
+    "noGroupSelected": "Выберите группу для управления",
+    "requiresApproval": "Требует одобрения",
+    "autoAdmit": "Автодопуск",
+    "requiresApprovalToggle": "Требовать одобрение для вступления"
+  },
+  "approvals": {
+    "title": "Одобрения",
+    "subtitle": "Одобрение или отклонение запросов доступа",
+    "refresh": "Обновить",
+    "empty": "Нет ожидающих одобрения",
+    "noGroup": "Выберите группу для просмотра одобрений",
+    "emptyHint": "Заявки появляются, когда пользователи запрашивают доступ.",
+    "emptyCta": "Открыть управление пользователями",
+    "commentLabel": "Комментарий (обязателен для отклонения)",
+    "commentPlaceholder": "Добавьте заметку",
+    "commentRequired": "Для отклонения нужен комментарий",
+    "approve": "Одобрить",
+    "disapprove": "Отклонить"
+  },
+  "users": {
+    "title": "Управление пользователями",
+    "subtitle": "Управляйте учетными записями и правами доступа",
+    "search": "Поиск по имени или email...",
+    "filters": {
+      "allRoles": "Все роли",
+      "allStatus": "Все статусы",
+      "active": "Активные",
+      "blocked": "Заблокированные",
+      "pending": "Ожидающие",
+      "approval": "Ожидает одобрения",
+      "disapproved": "Отклонённые",
+      "anonymized": "Анонимизированные",
+      "testUsersOnly": "Только тестовые пользователи"
+    },
+    "table": {
+      "name": "Имя",
+      "email": "Email",
+      "role": "Роль",
+      "status": "Статус",
+      "lastActive": "Последняя активность",
+      "actions": "Действия",
+      "view": "Просмотр",
+      "never": "Никогда",
+      "testUserBadge": "Тестовый пользователь"
+    },
+    "pagination": {
+      "showing": "Показано",
+      "of": "из",
+      "users": "пользователей",
+      "page": "Страница"
+    },
+    "empty": "Пользователи не найдены",
+    "sort": {
+      "ariaLabel": "Сортировка пользователей",
+      "newest": "Сначала новые",
+      "oldest": "Сначала старые",
+      "nameAsc": "Имя (А→Я)",
+      "emailAsc": "Email (A→Z)",
+      "lastActive": "Последняя активность (новые)",
+      "mostSessions": "Больше всего сессий"
+    },
+    "pageSize": {
+      "ariaLabel": "Пользователей на странице"
+    },
+    "createUser": {
+      "title": "Создать пользователя",
+      "subtitle": "Добавить нового пользователя в систему",
+      "button": "Добавить пользователя",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "displayName": "Имя",
+      "displayNamePlaceholder": "Имя пользователя",
+      "role": "Роль",
+      "status": "Статус",
+      "submit": "Создать",
+      "cancel": "Отмена",
+      "success": "Пользователь успешно создан",
+      "error": {
+        "emailRequired": "Email обязателен",
+        "displayNameRequired": "Имя обязательно",
+        "invalidEmail": "Неверный формат email",
+        "emailExists": "Пользователь с таким email уже существует",
+        "generic": "Ошибка при создании пользователя"
+      }
+    }
+  },
+  "userProfile": {
+    "backToList": "Вернуться к списку",
+    "accountInfo": "Информация об аккаунте",
+    "created": "Создан",
+    "lastLogin": "Последний вход",
+    "totalSessions": "Всего сессий",
+    "userId": "ID пользователя",
+    "adminActions": "Административные действия",
+    "blockUser": "Заблокировать пользователя",
+    "unblockUser": "Разблокировать пользователя",
+    "changeRole": "Изменить роль",
+    "gdpr": {
+      "title": "Права на данные GDPR",
+      "description": "Эти действия поддерживают соответствие GDPR для переноса и удаления данных.",
+      "downloadArchive": "Скачать архив",
+      "executeErasure": "Выполнить удаление",
+      "exportRequested": "Экспорт запрошен. ID задания:",
+      "exportReady": "Вы получите email, когда экспорт будет готов для скачивания."
+    },
+    "erasure": {
+      "confirmTitle": "Подтверждение удаления данных",
+      "cannotUndo": "Это действие нельзя отменить",
+      "warning": "Это навсегда анонимизирует все персональные данные для",
+      "reason": "Причина удаления (обязательно)",
+      "reasonPlaceholder": "Введите причину этого запроса на удаление данных...",
+      "cancel": "Отмена",
+      "execute": "Выполнить удаление"
+    },
+    "anonymized": {
+      "title": "Анонимизированный аккаунт",
+      "description": "Данные этого пользователя были анонимизированы по запросу GDPR. Персональная информация удалена и не может быть восстановлена."
+    }
+  },
+  "research": {
+    "title": "Исследования и модерация",
+    "subtitle": "Просматривайте и аннотируйте сессии чата",
+    "search": "Поиск по ID сессии или пользователю...",
+    "filters": {
+      "allStatus": "Все статусы",
+      "pending": "Ожидает",
+      "inReview": "На проверке",
+      "moderated": "Модерировано"
+    },
+    "session": {
+      "user": "Пользователь",
+      "anonymous": "Анонимный",
+      "messages": "сообщений",
+      "total": "всего сессий",
+      "pendingReview": "ожидают проверки"
+    }
+  },
+  "moderation": {
+    "backToSessions": "Назад",
+    "columns": {
+      "transcript": "Транскрипт",
+      "goldenReference": "Эталонный ответ",
+      "annotation": "Аннотация"
+    },
+    "transcript": {
+      "messages": "сообщений"
+    },
+    "golden": {
+      "title": "Эталонные ответы",
+      "subtitle": "Идеальные ответы для обучения",
+      "placeholder": "Введите идеальный ответ для этого сообщения...",
+      "rlhfNote": "Это будет использовано как обучающие данные для RLHF.",
+      "selectMessage": "Выберите сообщение из транскрипта, чтобы добавить эталонный ответ",
+      "previous": "Предыдущие аннотации",
+      "rating": "Рейтинг"
+    },
+    "annotation": {
+      "title": "Аннотация",
+      "subtitle": "Оцените и отметьте эту сессию",
+      "qualityRating": "Оценка качества",
+      "ratings": {
+        "poor": "Плохо",
+        "fair": "Удовлетворительно",
+        "good": "Хорошо",
+        "veryGood": "Очень хорошо",
+        "excellent": "Превосходно"
+      },
+      "notes": "Заметки",
+      "notesPlaceholder": "Добавьте ваши наблюдения и заметки...",
+      "messageTags": "Теги сообщения",
+      "save": "Сохранить аннотацию",
+      "markComplete": "Отметить как завершено"
+    },
+    "tags": {
+      "addTag": "Добавить тег",
+      "sessionTags": "Теги сессии",
+      "customTag": "Свой тег..."
+    }
+  },
+  "privacy": {
+    "title": "Контроль конфиденциальности",
+    "subtitle": "Соответствие GDPR и управление защитой данных",
+    "piiProtection": {
+      "title": "Защита PII",
+      "masked": "Персональные данные скрыты для безопасного просмотра",
+      "visible": "Персональные данные сейчас видимы"
+    },
+    "dataRequests": {
+      "title": "Запросы данных",
+      "subtitle": "Активные запросы на экспорт и доступ",
+      "pending": "Ожидают"
+    },
+    "anonymizedRecords": {
+      "title": "Анонимизированные записи",
+      "subtitle": "пользователей анонимизировано"
+    },
+    "quickActions": {
+      "title": "Быстрые действия",
+      "bulkExport": "Массовый экспорт",
+      "bulkExportDesc": "Экспортировать все данные пользователей для аудита",
+      "generateReport": "Сгенерировать отчет",
+      "generateReportDesc": "Создать отчет соответствия GDPR",
+      "dataRetention": "Хранение данных",
+      "dataRetentionDesc": "Просмотреть политики хранения"
+    },
+    "auditLog": {
+      "title": "Журнал аудита",
+      "search": "Поиск в журналах...",
+      "columns": {
+        "action": "Действие",
+        "targetUser": "Целевой пользователь",
+        "performedBy": "Выполнил",
+        "date": "Дата",
+        "status": "Статус"
+      },
+      "actions": {
+        "dataExport": "Экспорт данных",
+        "dataErasure": "Удаление данных",
+        "piiAccess": "Доступ к PII"
+      },
+      "status": {
+        "completed": "Завершено",
+        "pending": "Ожидает"
+      }
+    },
+    "gdprCompliance": {
+      "title": "Статус соответствия GDPR",
+      "description": "Эта система поддерживает Статью 15 (Право на доступ), Статью 17 (Право на удаление) и Статью 20 (Право на переносимость данных). Все действия по обработке данных записываются для аудита."
+    }
+  },
+  "review": {
+    "common": {
+      "back": "Назад",
+      "cancel": "Отмена",
+      "close": "Закрыть",
+      "confirm": "Подтвердить",
+      "error": "Ошибка",
+      "loading": "Загрузка...",
+      "noData": "Нет данных",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "retry": "Повторить"
+    },
+    "config": {
+      "title": "Настройки рецензирования",
+      "lastUpdated": "Обновлено {{user}} {{date}}",
+      "minReviews": "Минимум рецензий",
+      "minReviewsDesc": "Минимальное количество рецензий на сессию",
+      "maxReviews": "Максимум рецензий",
+      "maxReviewsDesc": "Максимальное количество рецензий на сессию",
+      "criteriaThreshold": "Порог критериев",
+      "criteriaThresholdDesc": "Оценка, при которой или ниже требуется отзыв по критериям",
+      "autoFlagThreshold": "Порог автопометки",
+      "autoFlagThresholdDesc": "Оценка, при которой или ниже сессии автоматически помечаются",
+      "varianceLimit": "Лимит отклонения",
+      "varianceLimitDesc": "Максимально допустимое отклонение оценок между рецензентами",
+      "timeoutHours": "Тайм-аут (часы)",
+      "timeoutHoursDesc": "Часы до истечения срока рецензирования",
+      "highRiskSlaHours": "SLA высокого риска (часы)",
+      "highRiskSlaHoursDesc": "Дедлайн SLA для флагов высокого риска",
+      "mediumRiskSlaHours": "SLA среднего риска (часы)",
+      "mediumRiskSlaHoursDesc": "Дедлайн SLA для флагов среднего риска",
+      "deanonymizationAccessHours": "Доступ деанонимизации (часы)",
+      "deanonymizationAccessHoursDesc": "Часы доступа после одобрения деанонимизации",
+      "minMessageThreshold": "Мин. кол-во сообщений",
+      "minMessageThresholdDesc": "Сессии с меньшим количеством сообщений помечаются как короткие",
+      "save": "Сохранить настройки",
+      "saved": "Настройки сохранены",
+      "unknownUser": "Неизвестный пользователь",
+      "validation": {
+        "range": "Значение должно быть между {{min}} и {{max}}",
+        "maxReviewsGteMin": "Максимум рецензий должен быть не меньше минимума",
+        "varianceRange": "Отклонение должно быть между 0 и максимальной оценкой"
+      }
+    },
+    "criteriaFeedback": {
+      "title": "Обратная связь по критериям",
+      "required": "Обязательно",
+      "checkboxHint": "Выберите критерии для оценок ≤ {{threshold}}. Детальный комментарий необязателен.",
+      "optionalDetail": "Добавьте необязательный комментарий...",
+      "selectAtLeastOne": "Выберите хотя бы один критерий."
+    },
+    "criteria": {
+      "relevance": { "name": "Релевантность", "description": "Насколько ответ затрагивает проблему пользователя" },
+      "empathy": { "name": "Эмпатия", "description": "Степень сочувствия и эмоциональной чуткости" },
+      "safety": { "name": "Безопасность", "description": "Обеспечивает ли ответ безопасность пользователя" },
+      "ethics": { "name": "Этика", "description": "Соблюдение этических норм и границ" },
+      "clarity": { "name": "Ясность", "description": "Насколько понятно и чётко сформулирован ответ" }
+    },
+    "escalation": {
+      "title": "Эскалации",
+      "empty": "Нет открытых эскалаций",
+      "overdueSla": "{{count}} просроченных SLA",
+      "acknowledge": "Подтвердить",
+      "resolve": "Решить",
+      "escalate": "Эскалировать",
+      "requestDeanonymization": "Запрос деанонимизации",
+      "submitDeanonymization": "Отправить запрос",
+      "resolutionNotes": "Заметки о решении..."
+    },
+    "flag": {
+      "title": "Флаг риска",
+      "severity": "Серьёзность",
+      "severityRequired": "Серьёзность обязательна",
+      "reason": "Категория причины",
+      "reasonRequired": "Категория причины обязательна",
+      "details": "Детали",
+      "detailsMin": "Минимум 10 символов",
+      "requestDeanonymization": "Запрос деанонимизации",
+      "deanonymizationJustification": "Обоснование деанонимизации...",
+      "submit": "Отправить флаг",
+      "autoDetected": "Автообнаружено",
+      "notificationDelivered": "Флаг создан — уведомления доставлены",
+      "notificationPending": "Флаг создан — доставка уведомлений ожидается",
+      "notificationFailed": "Флаг создан — доставка уведомлений не удалась",
+      "severityOptions": {
+        "high": "Высокий",
+        "medium": "Средний",
+        "low": "Низкий"
+      },
+      "reasonOptions": {
+        "crisis_indicators": "Кризисные индикаторы",
+        "self_harm_language": "Язык самоповреждения",
+        "inappropriate_ai_response": "Неуместный ответ ИИ",
+        "ethical_concern": "Этическое беспокойство",
+        "other_safety_concern": "Другое беспокойство о безопасности"
+      }
+    },
+    "queue": {
+      "title": "Очередь рецензирования",
+      "subtitle": "Рецензируйте и оценивайте чат-сессии",
+      "tabsAriaLabel": "Вкладки очереди рецензирования",
+      "tabs": {
+        "pending": "Ожидают",
+        "flagged": "Помечены",
+        "in_progress": "В процессе",
+        "completed": "Завершены"
+      },
+      "scope": {
+        "label": "Область",
+        "allSpaces": "Все пространства",
+        "selectedSpace": "Текущее пространство",
+        "selectedSpaceUnavailable": "Пространство недоступно",
+        "loadingSpaces": "Загрузка пространств..."
+      },
+      "filters": {
+        "toggle": "Фильтры",
+        "riskLevel": "Уровень риска",
+        "allRiskLevels": "Все уровни риска",
+        "language": "Язык",
+        "allLanguages": "Все языки",
+        "languageEn": "Английский",
+        "languageUk": "Украинский",
+        "languageRu": "Русский",
+        "dateFrom": "От",
+        "dateTo": "До",
+        "sortBy": "Сортировать по",
+        "sortPriority": "Приоритету",
+        "sortOldest": "Самые старые",
+        "sortNewest": "Самые новые",
+        "assignedToMe": "Назначены мне",
+        "clearAll": "Очистить все"
+      },
+      "assign": {
+        "title": "Назначить рецензента",
+        "placeholder": "Выберите рецензента...",
+        "confirm": "Назначить",
+        "cancel": "Отмена"
+      },
+      "empty": {
+        "title": "Нет сессий для рецензирования",
+        "description": "Нет сессий, соответствующих текущим фильтрам."
+      },
+      "error": {
+        "title": "Не удалось загрузить очередь",
+        "retry": "Повторить"
+      },
+      "pagination": {
+        "ariaLabel": "Пагинация",
+        "previous": "Предыдущая",
+        "next": "Следующая",
+        "pageInfo": "Страница {{current}} из {{total}}",
+        "showing": "Показано {{start}}-{{end}} из {{total}}"
+      }
+    },
+    "ratingPanel": {
+      "title": "Ваша оценка",
+      "commentLabel": "Комментарий",
+      "commentPlaceholder": "Добавьте комментарий к рецензии...",
+      "commentAriaLabel": "Комментарий рецензии",
+      "saving": "Сохранение...",
+      "saved": "Сохранено",
+      "autoSaveHint": "Оценки сохраняются автоматически",
+      "saveError": "Не удалось сохранить. Повторите попытку."
+    },
+    "riskLevels": {
+      "high": "Высокий",
+      "medium": "Средний",
+      "low": "Низкий",
+      "none": "Нет"
+    },
+    "score": {
+      "labels": {
+        "1": "Неприемлемо",
+        "2": "Очень плохо",
+        "3": "Плохо",
+        "4": "Ниже среднего",
+        "5": "Средне",
+        "6": "Выше среднего",
+        "7": "Хорошо",
+        "8": "Очень хорошо",
+        "9": "Отлично",
+        "10": "Превосходно"
+      }
+    },
+    "scoreSelector": {
+      "label": "Оценка",
+      "ariaLabel": "Выберите оценку от 1 до 10",
+      "buttonAriaLabel": "Оценка {{score}}"
+    },
+    "session": {
+      "title": "Сессия рецензирования",
+      "loading": "Загрузка сессии...",
+      "transcript": "Транскрипт",
+      "roleAssistant": "Ассистент",
+      "roleUser": "Пользователь",
+      "assistantMessageAriaLabel": "Оценить это сообщение ассистента",
+      "rateMessage": "Оценить сообщение",
+      "rateAll": "Оценить все сообщения",
+      "rated": "Оценено",
+      "noMessagesTitle": "Нет сообщений",
+      "noMessagesDescription": "В этой сессии нет сообщений для рецензирования.",
+      "submitReview": "Отправить рецензию",
+      "submitting": "Отправка...",
+      "submitted": "Рецензия отправлена",
+      "complete": "Завершено",
+      "blinded": "Заслеплено",
+      "tiebreaker": "Решающая рецензия",
+      "disputed": "Оспорено",
+      "disputedClosed": "Оспаривание закрыто",
+      "flags": "Флаги",
+      "reviewCount": "{{count}} рецензий",
+      "allReviews": "Все рецензии",
+      "aggregateScore": "Общая оценка",
+      "scoreRange": "{{min}} – {{max}}"
+    },
+    "sessionCard": {
+      "ariaLabel": "Карточка сессии рецензирования",
+      "messageCount": "{{count}} сообщений",
+      "riskLevel": "Риск: {{level}}",
+      "reviewProgress": "{{completed}} / {{required}} рецензий",
+      "progressAriaLabel": "Прогресс рецензирования",
+      "assignedTo": "Назначено",
+      "assign": "Назначить",
+      "autoFlagged": "Автопомечено",
+      "expired": "Просрочено",
+      "expiresIn": "Истекает через {{hours}} ч {{minutes}} мин",
+      "expiresInMinutes": "Истекает через {{minutes}} мин"
+    },
+    "tags": {
+      "title": "Теги",
+      "tagManagement": "Управление тегами",
+      "createNew": "Создать новый тег",
+      "tagName": "Название тега",
+      "tagLabel": "Метка",
+      "tagDescription": "Описание",
+      "category": "Категория",
+      "categoryChat": "Тег чата",
+      "categoryUser": "Тег пользователя",
+      "excludeFromReviews": "Исключает из рецензирования",
+      "active": "Активный",
+      "inactive": "Неактивный",
+      "editTag": "Редактировать",
+      "deleteTag": "Удалить",
+      "confirmDelete": "Удалить тег",
+      "confirmDeleteDescription": "Вы уверены, что хотите удалить этот тег? Это действие нельзя отменить.",
+      "duplicateError": "Тег с таким именем уже существует",
+      "noTags": "Тегов не найдено",
+      "addTag": "Добавить тег...",
+      "assignTag": "Назначить тег",
+      "loadError": "Не удалось загрузить теги",
+      "filter": "Фильтр по тегу",
+      "excluded": "Исключённые",
+      "excludedSessions": "Исключённые сессии",
+      "exclusionReason": "Причина исключения"
+    },
+    "time": {
+      "justNow": "Только что",
+      "minutesAgo": "{{count}} мин назад",
+      "hoursAgo": "{{count}} ч назад",
+      "daysAgo": "{{count}} дн назад"
+    },
+    "progress": {
+      "rated": "{{rated}} из {{total}} оценено",
+      "readyToSubmit": "Готово к отправке",
+      "notReady": "Оцените все сообщения для отправки",
+      "ariaLabel": "{{rated}} из {{total}} сообщений оценено"
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "markAllRead": "Отметить все как прочитанные",
+      "empty": "Нет уведомлений",
+      "banners": {
+        "escalations": "{{count}} эскалаций требуют внимания",
+        "deanonymizations": "{{count}} запросов на деанонимизацию ожидают",
+        "overdue": "{{count}} просроченных рецензий"
+      }
+    },
+    "deanonymization": {
+      "title": "Деанонимизация",
+      "request": "Запрос деанонимизации",
+      "submitted": "Запрос отправлен",
+      "category": "Категория обоснования",
+      "details": "Детали",
+      "detailsMin": "Минимум 10 символов",
+      "submit": "Отправить запрос",
+      "pending": "Ожидает",
+      "approved": "Одобрено",
+      "denied": "Отклонено",
+      "accessExpired": "Доступ истёк",
+      "accessExpires": "Истекает через {{time}}",
+      "revealError": "Не удалось раскрыть личность",
+      "revealedIdentity": "Раскрыть личность",
+      "approveConfirm": "Одобрить деанонимизацию?",
+      "approveConfirmDetail": "Это предоставит временный доступ к персональной информации.",
+      "approve": "Одобрить",
+      "deny": "Отклонить",
+      "denialNotes": "Заметки к отклонению...",
+      "fieldName": "Имя",
+      "fieldEmail": "Электронная почта",
+      "welfareCheck": "Проверка благополучия",
+      "legalRequirement": "Юридическое требование",
+      "clinicalEscalation": "Клиническая эскалация",
+      "investigation": "Расследование",
+      "justification": "Детали обоснования",
+      "justificationPlaceholder": "Объясните, почему необходима деанонимизация (мин. 10 символов)..."
+    },
+    "dashboard": {
+      "title": "Моя панель",
+      "teamTitle": "Панель команды",
+      "noData": "Нет данных",
+      "scoreDistribution": "Распределение оценок",
+      "criteriaBreakdown": "Разбивка по критериям",
+      "weeklyTrend": "Недельный тренд",
+      "queueDepth": "Глубина очереди",
+      "stats": {
+        "reviewsCompleted": "Завершено рецензий",
+        "averageScore": "Средняя оценка",
+        "agreementRate": "Уровень согласия",
+        "totalReviews": "Всего рецензий",
+        "teamAverage": "Среднее по команде",
+        "interRaterReliability": "Межрецензентная надёжность",
+        "pendingEscalations": "Ожидающие эскалации",
+        "pendingDeanonymizations": "Ожидающие деанонимизации"
+      },
+      "workload": {
+        "title": "Нагрузка рецензентов",
+        "reviewer": "Рецензент",
+        "completed": "Завершено",
+        "inProgress": "В процессе",
+        "average": "Среднее"
+      }
+    },
+    "reports": {
+      "title": "Отчёты и аналитика",
+      "type": "Тип отчёта",
+      "reportType": "Тип отчёта",
+      "from": "От",
+      "dateFrom": "От",
+      "to": "До",
+      "dateTo": "До",
+      "format": "Формат",
+      "generating": "Генерация...",
+      "generate": "Сгенерировать отчёт",
+      "preview": "Результат",
+      "downloaded": "Отчёт загружен:"
+    },
+    "errorBoundary": {
+      "title": "Что-то пошло не так",
+      "description": "В модуле рецензирования произошла ошибка. Пожалуйста, попробуйте ещё раз.",
+      "retry": "Попробовать снова"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "subtitle": "Управляйте вашими настройками",
+    "showTechnicalDetails": "Показать технические детали",
+    "profile": {
+      "title": "Профиль"
+    },
+    "privacy": {
+      "title": "Конфиденциальность",
+      "piiMasking": "Скрытие PII",
+      "piiMaskingDesc": "Скрыть персональную информацию в Рабочем пространстве"
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "email": "Email-уведомления",
+      "emailDesc": "Получать обновления по электронной почте",
+      "browser": "Браузерные уведомления",
+      "browserDesc": "Показывать уведомления на рабочем столе",
+      "digest": "Еженедельный дайджест",
+      "digestDesc": "Сводка активности каждую неделю"
+    },
+    "appearance": {
+      "title": "Внешний вид",
+      "light": "Светлая",
+      "dark": "Темная",
+      "system": "Системная"
+    },
+    "language": {
+      "title": "Язык и регион",
+      "language": "Язык",
+      "timezone": "Часовой пояс"
+    },
+    "admin": {
+      "title": "Админ‑настройки",
+      "subtitle": "Глобальные настройки гостевого доступа и одобрений",
+      "reload": "Обновить",
+      "guestMode": "Гостевой режим",
+      "guestModeDesc": "Разрешить неаутентифицированным пользователям начать чат",
+      "cooloffDays": "Период ожидания (дней)",
+      "cooloffDaysDesc": "Дней до повторной заявки после отклонения",
+      "otpDisable": "Отключить OTP вход для Workbench",
+      "otpDisableDesc": "Когда включено, пользователи Workbench смогут входить только через Google. Вход по email будет скрыт.",
+      "save": "Сохранить"
+    },
+    "save": "Сохранить изменения"
+  },
+  "roles": {
+    "user": "Пользователь",
+    "qa_specialist": "QA-специалист",
+    "researcher": "Исследователь",
+    "supervisor": "Супервизор",
+    "moderator": "Модератор",
+    "group_admin": "Администратор группы",
+    "owner": "Владелец"
+  },
+  "supervision": {
+    "title": "Проверка супервизора",
+    "queue": "Очередь супервизии",
+    "queueEmpty": "Нет рецензий для супервизии",
+    "chatTranscript": "Стенограмма чата",
+    "reviewerAssessment": "Оценка рецензента",
+    "messageRatings": "Оценки сообщений",
+    "message": "Сообщение",
+    "priorDecisions": "Предыдущие решения",
+    "yourDecision": "Ваше решение",
+    "approve": "Одобрить",
+    "disapprove": "Отклонить",
+    "comments": "Комментарии",
+    "commentsPlaceholder": "Объясните ваше решение...",
+    "returnToReviewer": "Вернуть рецензенту на доработку",
+    "submitDecision": "Отправить решение",
+    "iteration": "Итерация",
+    "contextNotFound": "Контекст супервизии не найден",
+    "noMessages": "Сообщения не найдены",
+    "reviewer": "Рецензент",
+    "submitted": "Отправлено",
+    "messages": "Сообщения",
+    "group": "Группа",
+    "awaitingFeedback": "Ожидает отзыва",
+    "awaitingEmpty": "Нет рецензий, ожидающих вашего отзыва",
+    "supervisorDecision": "Решение супервизора",
+    "viewDetails": "Подробности",
+    "tab": {
+      "transcript": "Транскрипт",
+      "assessment": "Оценка",
+      "decision": "Решение"
+    }
+  },
+  "gradeDescription": {
+    "title": "Описания оценок",
+    "editTooltip": "Редактировать описание",
+    "save": "Сохранить",
+    "cancel": "Отмена"
+  },
+  "groupConfig": {
+    "title": "Настройки рецензирования группы",
+    "reviewerCountOverride": "Количество рецензентов",
+    "supervisionPolicy": "Политика супервизии",
+    "samplePercentage": "Процент выборки",
+    "useGlobalDefault": "Использовать глобальное значение",
+    "save": "Сохранить",
+    "reset": "Сбросить к глобальным"
+  },
+  "groupUserCreation": {
+    "checkEmail": "Проверить",
+    "userFound": "Пользователь найден: {{name}}. Нажмите Добавить, чтобы добавить в группу.",
+    "notFound": "Учётная запись не найдена — создать нового пользователя",
+    "displayName": "Имя",
+    "namePlaceholder": "Введите полное имя",
+    "role": "Роль",
+    "nameRequired": "Имя обязательно для создания нового пользователя",
+    "alreadyMember": "Этот пользователь уже является участником этой группы",
+    "invitationSent": "Пользователь создан и добавлен в группу"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "cancel": "Отмена",
+    "show": "Показать",
+    "hide": "Скрыть",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "view": "Просмотр",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "or": "или",
+    "all": "Все",
+    "none": "Нет",
+    "yes": "Да",
+    "no": "Нет",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Предыдущий",
+    "signOut": "Выйти",
+    "notFound": "Не найдено",
+    "saving": "Сохранение...",
+    "confirm": "Подтвердить",
+    "creating": "Создание..."
+  },
+  "survey": {
+    "status": { "draft": "Черновик", "published": "Опубликована", "archived": "Архивирована" },
+    "instanceStatus": { "draft": "Запланировано", "active": "Активна", "expired": "Истекла", "closed": "Закрыта" },
+    "dataType": {
+      "group": {
+        "numeric": "Числовые",
+        "dateTime": "Дата / Время",
+        "ratingScale": "Шкала оценки",
+        "presets": "Текстовые шаблоны",
+        "text": "Текст"
+      },
+      "integerSigned": "Целое (со знаком)",
+      "integerUnsigned": "Целое (без знака)",
+      "decimal": "Десятичное",
+      "date": "Дата",
+      "time": "Время",
+      "datetime": "Дата и время",
+      "ratingScale": "Шкала оценки",
+      "email": "Email",
+      "phone": "Телефон",
+      "url": "URL",
+      "postalCode": "Почтовый индекс",
+      "alphanumericCode": "Буквенно-цифровой код",
+      "text": "Текст (произвольный)"
+    },
+    "ratingScale": {
+      "startValue": "Начальное значение",
+      "endValue": "Конечное значение",
+      "step": "Шаг",
+      "segmentCount": "{{count}} сегментов",
+      "invalidConfig": "Некорректная конфигурация: диапазон должен делиться на шаг без остатка"
+    },
+    "condition": {
+      "add": "+ Добавить условие",
+      "remove": "Удалить условие",
+      "ifLabel": "Показать, если",
+      "equals": "равно",
+      "notEquals": "не равно",
+      "in": "одно из",
+      "contains": "содержит",
+      "selectValue": "Выберите значение...",
+      "valuePlaceholder": "Значение",
+      "dependsOn": "Зависит от В{{order}}",
+      "dependsOnShort": "В{{order}}",
+      "addCondition": "Добавить условие",
+      "removeCondition": "Удалить",
+      "combinator": {
+        "and": "И",
+        "or": "ИЛИ"
+      },
+      "operator": {
+        "not_in": "не является одним из"
+      },
+      "multiValue": {
+        "addValue": "Добавить значение",
+        "placeholder": "Введите и нажмите Enter"
+      },
+      "staleRemoved": "Условие ссылается на удалённый вопрос — удалено"
+    },
+    "option": {
+      "freetextLabel": "Включить ввод текста",
+      "freetextRequired": "Обязательный ввод текста",
+      "freetextType": {
+        "string": "Текст",
+        "number": "Число"
+      }
+    },
+    "preview": {
+      "title": "Предпросмотр видимости",
+      "show": "Предпросмотр",
+      "hide": "Скрыть предпросмотр",
+      "hidden": "Скрыто",
+      "reset": "Сбросить ответы",
+      "visibleCount": "{{visible}} из {{total}} видимы",
+      "button": "Предпросмотр",
+      "open": "Предпросмотр опроса",
+      "exit": "Выйти из предпросмотра",
+      "badge": "Режим предпросмотра",
+      "noQuestions": "Добавьте хотя бы один вопрос для предпросмотра"
+    },
+    "autosave": {
+      "saving": "Сохранение...",
+      "saved": "Сохранено",
+      "failed": "Ошибка сохранения",
+      "retry": "Повторить"
+    },
+    "conflict": {
+      "title": "Схема обновлена извне",
+      "message": "Другой пользователь изменил эту схему. Перезагрузите, чтобы увидеть изменения, или продолжайте редактирование (ваше следующее сохранение перезапишет их изменения).",
+      "reload": "Перезагрузить",
+      "continue": "Продолжить редактирование"
+    },
+    "freetext": {
+      "placeholder": "Введите ваш ответ...",
+      "placeholderNumber": "Введите число..."
+    },
+    "export": {
+      "button": "Экспорт"
+    },
+    "import": {
+      "button": "Импорт",
+      "title": "Импорт схемы опроса",
+      "dragDrop": "Перетащите JSON-файл сюда или",
+      "importing": "Импорт...",
+      "browse": "Выберите файл",
+      "hint": "JSON-файлы до 5 МБ",
+      "validationFailed": "Ошибка валидации"
+    },
+    "schemas": {
+      "title": "Схемы опросов", "create": "Новая схема", "showArchived": "Показать архивные", "empty": "Схем опросов пока нет.",
+      "clone": "Клонировать", "archive": "Архивировать", "restore": "Восстановить", "createFailed": "Не удалось создать схему",
+      "col": { "title": "Название", "status": "Статус", "questions": "Вопросы", "created": "Создано", "published": "Опубликовано", "actions": "Действия" }
+    },
+    "schema": {
+      "untitled": "Без названия", "editTitle": "Редактировать схему", "viewTitle": "Просмотр схемы", "publish": "Опубликовать",
+      "notFound": "Схема не найдена", "titleLabel": "Название", "descriptionLabel": "Описание", "questionsHeading": "Вопросы"
+    },
+    "publish": { "confirmTitle": "Опубликовать схему?", "confirmMessage": "После публикации схема станет неизменяемой — вопросы и настройки нельзя будет изменить. Позже можно создать копию для редактирования.", "confirm": "Да, опубликовать" },
+    "question": { "add": "Добавить вопрос", "required": "Обязательный", "riskFlag": "Флаг риска", "minValue": "Мин. значение", "maxValue": "Макс. значение", "min": "Мин.", "max": "Макс.", "dataType": "Тип данных", "textPlaceholder": "Введите текст вопроса...", "options": "Варианты", "option": "Вариант", "addOption": "Добавить вариант", "minLength": "Мин. длина", "maxLength": "Макс. длина", "regex": "Regex", "type": { "free_text": "Свободный текст", "integer_signed": "Целое (со знаком)", "integer_unsigned": "Целое (без знака)", "decimal": "Десятичное", "date": "Дата", "time": "Время", "datetime": "Дата и время", "email": "Email", "phone": "Телефон", "url": "URL", "postal_code": "Почтовый индекс", "alphanumeric_code": "Буквенно-цифровой код", "rating_scale": "Шкала оценки", "single_choice": "Один выбор", "multi_choice": "Несколько вариантов", "boolean": "Да / Нет" } },
+    "questionType": { "group": { "numeric": "Числовые", "dateTime": "Дата / Время", "ratingScale": "Шкала оценки", "presets": "Текстовые шаблоны", "text": "Текст", "selection": "Выбор" } },
+    "instances": {
+      "title": "Экземпляры опросов", "create": "Новый экземпляр", "empty": "Экземпляров пока нет.",
+      "col": { "title": "Название", "status": "Статус", "groups": "Группы", "start": "Начало", "expiry": "Окончание", "completed": "Завершено" }
+    },
+    "instance": {
+      "createTitle": "Создать экземпляр", "schema": "Схема", "selectSchema": "Выберите опубликованную схему...", "groups": "Целевые группы", "noGroups": "Нет групп", "priority": "Приоритет",
+      "addToMemory": "Добавить в память", "publicHeader": "Публичный заголовок", "publicHeaderPlaceholder": "Заголовок для пользователей (необязательно)", "showReview": "Показать шаг проверки", "startDate": "Дата начала", "expirationDate": "Дата окончания", "create": "Создать", "requiredFields": "Все поля обязательны",
+      "expiryAfterStart": "Дата окончания должна быть позже даты начала", "createFailed": "Не удалось создать", "notFound": "Экземпляр не найден",
+      "details": "Детали", "groupCount": "группа(ы)", "close": "Закрыть экземпляр", "viewResponses": "Посмотреть ответы", "snapshot": "Снимок схемы"
+    },
+    "responses": { "title": "Ответы", "empty": "Ответов пока нет.", "complete": "Завершено", "partial": "Частично", "started": "Начато", "completed": "Завершено", "notShown": "Не показано", "hideNonVisible": "Скрыть невидимые ответы" },
+    "invalidation": { "invalidateAll": "Аннулировать все результаты", "invalidateGroup": "Аннулировать результаты группы", "invalidateOne": "Аннулировать", "invalidated": "Аннулировано", "invalidatedAt": "Аннулировано", "group": "Группа", "selectGroup": "Выбрать группу", "reasonPrompt": "Причина аннулирования (необязательно)" },
+    "groupSurveys": { "title": "Опросы группы", "tab": "Опросы", "empty": "Опросов в этой группе нет.", "completed": "{{count}} завершено", "downloadJson": "Скачать JSON", "downloadCsv": "Скачать CSV" }
+  },
+  "surveyGate": {
+    "checking": "Проверка опросов...",
+    "retry": "Попробовать снова",
+    "progress": "Вопрос {{current}} из {{total}}",
+    "next": "Далее",
+    "back": "Назад",
+    "review": "Просмотр ответов",
+    "reviewTitle": "Проверьте ваши ответы",
+    "edit": "Редактировать",
+    "submit": "Отправить",
+    "submitting": "Отправка...",
+    "close": "Закрыть",
+    "requiredError": "Это обязательный вопрос.",
+    "yes": "Да",
+    "no": "Нет",
+    "noAnswer": "Нет ответа",
+    "typeAnswer": "Введите ваш ответ...",
+    "submitError": "Не удалось отправить. Попробуйте ещё раз.",
+    "validation": {
+      "integerSigned": "Введите корректное целое число",
+      "integerUnsigned": "Введите неотрицательное целое число",
+      "decimal": "Введите корректное десятичное число",
+      "email": "Введите корректный email адрес",
+      "phone": "Введите корректный номер телефона",
+      "url": "Введите корректный URL",
+      "postal_code": "Введите корректный почтовый индекс",
+      "alphanumeric_code": "Используйте только буквы и цифры"
+    }
+  }
+}
+
